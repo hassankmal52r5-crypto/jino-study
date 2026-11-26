@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jino Study - Semester 1</title>
+<meta name="theme-color" content="#7c3aed">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Jino Study">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+ --bg:#eef0fb; --card:#ffffff; --ink:#1e1b4b; --muted:#6b7280;
+ --blue:#2563eb; --purple:#7c3aed; --grad:linear-gradient(135deg,#2563eb,#7c3aed);
+ --ok:#16a34a; --bad:#dc2626; --line:#e5e7eb;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+header{background:var(--grad);color:#fff;padding:18px 16px 22px;border-radius:0 0 24px 24px;box-shadow:0 6px 24px rgba(80,60,220,.25)}
+header h1{margin:0;font-size:22px}
+.hrow{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+header p{margin:4px 0 0;opacity:.85;font-size:13px}
+.tourbtn{flex-shrink:0;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:700;cursor:pointer;margin-left:6px}
+.wrap{max-width:560px;margin:0 auto;padding:14px 14px 90px}
+.card{background:var(--card);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 2px 10px rgba(30,27,75,.06)}
+.subj{cursor:pointer;display:block;width:100%;text-align:left;border:0}
+.subj h2{margin:0 0 2px;font-size:18px}
+.subj .lec{color:var(--muted);font-size:13px;margin-bottom:10px}
+.bar{height:9px;background:#ececf6;border-radius:99px;overflow:hidden}
+.bar div{height:100%;background:var(--grad);border-radius:99px;transition:width .4s}
+.pct{font-size:12px;color:var(--muted);margin-top:6px}
+.tabs{display:flex;gap:6px;margin:14px 0;position:sticky;top:8px;z-index:5}
+.tabs button{flex:1;border:0;background:#fff;color:var(--muted);border-radius:12px;padding:9px 2px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(30,27,75,.08);cursor:pointer}
+.tabs button.on{background:var(--grad);color:#fff}
+.back{background:none;border:0;color:#fff;font-size:14px;font-weight:700;padding:0 0 8px;cursor:pointer;opacity:.9}
+.sec h3{margin:0;font-size:17px;color:var(--purple);flex:1}
+.sechead{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+.sec-ar-title{width:100%;font-size:13px;color:var(--muted);direction:rtl;text-align:right;display:none;margin:2px 0 0}
+.show-ar .sec-ar-title{display:block}
+.langbtn{width:54px;height:30px;border-radius:99px;border:2px solid var(--purple);background:#fff;position:relative;cursor:pointer;padding:0;flex-shrink:0;transition:background .18s ease}
+.langbtn .knob{position:absolute;top:1px;left:2px;width:24px;height:24px;border-radius:50%;background:var(--grad);color:#fff;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:left .18s ease;font-family:inherit}
+.langbtn.on{background:var(--purple)}
+.langbtn.on .knob{left:24px;background:#fff;color:var(--purple)}
+.sec p,.sec li{font-size:15px;line-height:1.65}
+.sec ul{padding-left:20px}
+.blk .arb{display:none;direction:rtl;text-align:right;background:#f5f3ff;border-radius:10px;padding:8px 12px;margin:4px 0 10px;font-size:14.5px;line-height:1.7;border-right:3px solid var(--purple)}
+.show-ar .blk .arb{display:block}
+.blk .arb ul{padding-right:20px;padding-left:0}
+.note{background:#fef3c7;border-radius:10px;padding:10px 12px;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:99px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.termdef{background:#eef2ff;border-radius:10px;padding:10px 12px;font-size:14px;margin-top:8px;border-right:3px solid var(--purple);width:100%}
+.termdef .ar{display:block;direction:rtl;text-align:right;margin-top:4px;color:#4c1d95}
+.readbtn{display:block;width:100%;margin-top:12px;border:2px solid var(--line);background:#fff;border-radius:12px;padding:11px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer}
+.readbtn.done{border-color:var(--ok);color:var(--ok);background:#f0fdf4}
+.btn{display:block;width:100%;border:0;background:var(--grad);color:#fff;border-radius:14px;padding:14px;font-size:15px;font-weight:800;margin-top:12px;cursor:pointer;box-shadow:0 4px 14px rgba(80,60,220,.3)}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.row{display:flex;justify-content:space-between;gap:4%}
+/* figures */
+.svgfig{margin:14px 0 4px;background:#fbfbff;border:1px solid var(--line);border-radius:12px;padding:8px}
+.svgfig svg{width:100%;height:auto;display:block}
+.viewer{margin:14px 0 4px;background:linear-gradient(160deg,#17123a,#2a1e63);border-radius:12px;overflow:hidden;position:relative}
+.viewer .vtitle{color:#c7d2fe;font-size:12px;font-weight:700;padding:8px 12px 0}
+.viewer .vhint{color:#8b8bb0;font-size:10.5px;padding:0 12px 6px}
+.viewer canvas{display:block;width:100%;height:270px;touch-action:none;cursor:grab}
+.figcap{font-size:12px;color:var(--muted);margin:6px 2px 0;text-align:center;line-height:1.5}
+/* flashcards */
+.flash{min-height:200px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;position:relative}
+.flash .inner{font-size:17px;font-weight:700;line-height:1.6;padding:8px;width:100%}
+.flash .backface{font-weight:500;font-size:15px}
+.flash .hint{position:absolute;bottom:10px;left:0;right:0;font-size:11px;color:var(--muted)}
+.fnav{display:flex;gap:8px;margin-top:12px}
+.fnav button{flex:1;border:0;border-radius:12px;padding:12px;font-weight:800;font-size:14px;cursor:pointer}
+.fnav .no{background:#fee2e2;color:var(--bad)}
+.fnav .yes{background:#dcfce7;color:var(--ok)}
+/* quiz */
+.q{font-size:16px;font-weight:800;line-height:1.5;margin-bottom:12px}
+.opt{display:block;width:100%;text-align:left;background:#f8f7ff;border:2px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;font-size:14.5px;cursor:pointer;line-height:1.45}
+.opt.ok{border-color:var(--ok);background:#f0fdf4}
+.opt.bad{border-color:var(--bad);background:#fef2f2}
+.opt:disabled{cursor:default}
+.fb{border-radius:12px;padding:12px;font-size:14px;margin-top:10px;line-height:1.6}
+.fb.ok{background:#f0fdf4;border:1px solid #bbf7d0}
+.fb.bad{background:#fef2f2;border:1px solid #fecaca}
+.fb .ar{display:block;direction:rtl;text-align:right;margin-top:6px;color:#57534e}
+.prog{font-size:12px;color:var(--muted);margin-bottom:8px}
+.score-big{font-size:46px;font-weight:900;text-align:center;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.center{text-align:center}
+.missed{text-align:left;font-size:13.5px;background:#fafafa;border-radius:10px;padding:10px 12px;margin:8px 0;border-right:3px solid var(--bad)}
+.model{background:#f8f7ff;border-radius:12px;padding:12px;font-size:14.5px;line-height:1.6;margin-top:10px}
+.prow{display:flex;align-items:center;gap:10px;margin:10px 0}
+.prow .lbl{flex:1;font-size:14px;font-weight:600}
+.prow .bar{flex:2}
+.prow .val{width:56px;text-align:left;font-size:12px;color:var(--muted)}
+.stat-grid{display:flex;gap:10px;margin:10px 0}
+.stat-grid .s{flex:1;background:#f8f7ff;border-radius:14px;padding:12px;text-align:center}
+.stat-grid .s b{display:block;font-size:20px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat-grid .s span{font-size:11px;color:var(--muted)}
+.small{font-size:12px;color:var(--muted)}
+.footer-note{text-align:center;font-size:11px;color:var(--muted);margin-top:22px;line-height:1.7}
+/* translation popup */
+#pop{position:fixed;z-index:70;max-width:320px;background:#1e1b4b;color:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.4);display:none;font-size:14px;line-height:1.6}
+#pop .par{direction:rtl;text-align:right;font-size:15px;font-weight:700;color:#e9d5ff}
+#pop .pen{font-size:12.5px;color:#c4b5fd;margin-top:4px}
+#pop .prow2{display:flex;gap:8px;margin-top:8px}
+#pop button{flex:1;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:9px;padding:7px;font-size:12.5px;font-weight:700;cursor:pointer}
+#pop .none{color:#fca5a5}
+/* plan */
+.weekrow{display:flex;gap:5px;overflow-x:auto;margin:10px 0 4px;padding-bottom:2px}
+.weekrow button{flex:0 0 auto;border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer}
+.weekrow button.on{border-color:var(--purple);color:var(--purple);background:#f5f3ff}
+.daycol{background:#fbfbff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:9px 0}
+.daycol .dh{display:flex;align-items:center;justify-content:space-between}
+.daycol .dh b{font-size:14px}
+.daycol .dh .today{font-size:10.5px;background:var(--grad);color:#fff;border-radius:99px;padding:3px 9px;font-weight:800}
+.sess{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 10px;margin:8px 0}
+.sess .dot{width:9px;height:9px;border-radius:50%;background:var(--grad);flex-shrink:0}
+.sess .si{flex:1;font-size:13px;line-height:1.4}
+.sess .si small{display:block;color:var(--muted);font-size:11px}
+.sess.done .si{text-decoration:line-through;opacity:.55}
+.sess button{border:0;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:800;cursor:pointer}
+.sess .chk{background:#dcfce7;color:var(--ok)}
+.sess.done .chk{background:#e5e7eb;color:var(--muted)}
+.sess .del{background:#fee2e2;color:var(--bad)}
+.addbox{background:#f5f3ff;border:1.5px dashed #c7d2fe;border-radius:12px;padding:10px;margin:8px 0}
+.addbox select{width:100%;padding:9px;border-radius:9px;border:1.5px solid #c7d2fe;font:inherit;font-size:13.5px;margin:5px 0;background:#fff}
+/* tour */
+#tourbg{position:fixed;inset:0;background:rgba(15,10,40,.72);z-index:80;display:none}
+#tourhl{position:fixed;z-index:81;border:3px solid #fbbf24;border-radius:14px;box-shadow:0 0 0 4000px rgba(15,10,40,.55),0 0 24px #fbbf24;display:none;pointer-events:none}
+#tourcard{position:fixed;z-index:82;left:16px;right:16px;background:#fff;border-radius:16px;padding:16px;display:none;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+#tourcard .tt{direction:rtl;text-align:right;font-size:14.5px;line-height:1.7;color:var(--ink)}
+#tourcard .tn{display:flex;gap:8px;margin-top:12px}
+#tourcard .tn button{flex:1;border:0;border-radius:10px;padding:10px;font-weight:800;font-size:13.5px;cursor:pointer}
+#tourcard .next{background:var(--grad);color:#fff}
+#tourcard .skip{background:#f3f4f6;color:var(--muted)}
+#tourcard .tcount{font-size:11px;color:var(--muted);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<header id="hdr"></header>
+<div class="wrap" id="app"></div>
+<div id="pop"></div>
+<div id="tourbg"></div><div id="tourhl"></div>
+<div id="tourcard"><div class="tt" id="tourtext"></div><div class="tn"><button class="skip" onclick="tourEnd()">تخطي</button><button class="next" id="tournext" onclick="tourNext()">التالي</button></div><div class="tcount" id="tourcount"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const LECTURES = {"ct": ["Introduction to CT physics", "CT generations", "CT components: operation 1", "CT components: operation 2", "CT components: operation 3", "Image processing and display 1", "Image processing and display 2", "Image quality 1", "Image quality 2", "Radiation protection practices", "Advanced CT 1", "Advanced CT scanning 2"], "bio": ["Introduction to Radiobiology", "Lecture 2", "Lecture 3", "Lecture 4", "Lecture 5", "Lecture 6", "Lecture 7", "Lecture 8", "Lecture 9", "Lecture 10", "Lecture 11", "Lecture 12", "Lecture 13", "Lecture 14"]};
+const DATA = {"ct": {"name": "Basic CT Radiography", "lec": "Lecture 1 - Introduction to CT physics", "short": "CT", "sections": [{"id": "ct1", "title_en": "What is CT?", "title_ar": "ما هو الـ CT؟", "figs": ["brain3d"], "blocks": [{"en": "<p><b>Tomography</b> comes from Greek: <b>tomo</b> = cross-section, layer, cut, and <b>graph</b> = something written or drawn. So tomography means recording a slice.</p>", "ar": "<p>كلمة <b>Tomography</b> جاية من اليوناني: <b>tomo</b> يعني مقطع أو شريحة، و<b>graph</b> يعني حاجة مكتوبة أو مرسومة. يعني توموجرافي = تسجيل شريحة.</p>"}, {"en": "<p>In 1937, making transverse x-ray cross-sections was called <b>Transverse Axial Tomography (TAT)</b>. After a digital computer was used to process the final images it was renamed <b>CAT</b> (computerized axial tomography), then abbreviated to <b>CT</b>. Other names you may meet: <b>CTAT</b> (computerized transaxial tomography) and <b>DAT</b> (digital axial tomography).</p>", "ar": "<p>سنة 1937، عمل مقاطع سينية مستعرضة كان اسمه <b>Transverse Axial Tomography (TAT)</b>. بعد ما الكمبيوتر الرقمي اتستخدم في معالجة الصور النهائية اتسمى <b>CAT</b>، وبعدين اختصر لـ <b>CT</b>. أسماء تانية ممكن تقابلها: <b>CTAT</b> و<b>DAT</b>.</p>"}, {"en": "<p><b>Definition:</b> computed tomography is the science that creates <b>two-dimensional cross-sectional images</b> from <b>three-dimensional body structures</b>. The 2D images can be reconstructed into different viewing modes.</p>", "ar": "<p><b>التعريف:</b> الـ CT هو العلم اللي بيعمل <b>صور مقطعية ثنائية الأبعاد</b> من <b>تراكيب الجسم الثلاثية الأبعاد</b>. والصور ثنائية الأبعاد ممكن يعاد بناؤها لأوضاع عرض مختلفة.</p>"}], "terms": [["tomography", "Greek: tomo = cross-section/layer/cut, graph = something written or drawn.", "توموجرافي: تسجيل شريحة أو مقطع من الجسم."], ["TAT", "Transverse Axial Tomography, 1937: transverse x-ray image cross-sections.", "التصوير المقطعي المحوري المستعرض، 1937."], ["CAT", "Computerized Axial Tomography: TAT after a digital computer processed the images.", "التصوير المقطعي المحوري بالحاسوب."], ["cross-sectional image", "A 2D slice view of a 3D body structure.", "صورة شريحة ثنائية الأبعاد لتركيب ثلاثي الأبعاد."]]}, {"id": "ct2", "title_en": "History of CT", "title_ar": "تاريخ الـ CT", "figs": ["svg_timeline"], "blocks": [{"en": "<p><b>1963:</b> <b>Alan Cormack</b>, a medical physicist, developed a mathematical method of reconstructing images from x-ray projections.</p>", "ar": "<p><b>1963:</b> <b>آلان كورماك</b>، فيزيائي طبي، طور طريقة رياضية لإعادة بناء الصور من إسقاطات الأشعة السينية.</p>"}, {"en": "<p><b>1971:</b> <b>Godfrey Hounsfield</b>, an engineer at the Central Research Laboratories of EMI Ltd in England, developed the <b>first clinically useful CT scanner</b>. The first clinical head scanner was installed at Atkinson-Morley Hospital in Wimbledon, England.</p>", "ar": "<p><b>1971:</b> <b>جودفري هاونسفيلد</b>، مهندس في معامل الأبحاث المركزية لشركة EMI في إنجلترا، طور <b>أول جهاز CT نافع إكلينيكياً</b>. أول ماسح للرأس اتثبت في مستشفى أتكينسون-مورلي في ويمبلدون، إنجلترا.</p>"}, {"en": "<p><b>1972:</b> Hounsfield demonstrated the first CT scanner, using Cormack's mathematics.</p>", "ar": "<p><b>1972:</b> هاونسفيلد عرض أول جهاز CT، باستخدام رياضيات كورماك.</p>"}, {"en": "<p><b>1979:</b> Hounsfield and Cormack shared the <b>Nobel Prize in medicine</b> for the development of CT.</p>", "ar": "<p><b>1979:</b> هاونسفيلد وكورماك اتقسموا <b>جائزة نوبل في الطب</b> عن تطوير الـ CT.</p>"}], "terms": [["Alan Cormack", "Medical physicist; 1963 mathematics of reconstruction from x-ray projections.", "فيزيائي طبي؛ صاحب رياضيات إعادة البناء (1963)."], ["Godfrey Hounsfield", "EMI engineer; built the first clinically useful CT scanner (1971).", "مهندس EMI؛ صنع أول جهاز CT إكلينيكي (1971)."], ["Atkinson-Morley Hospital", "Wimbledon, England: where the first clinical CT head scanner was installed (1971).", "المستشفى اللي اتثبت فيه أول ماسح CT للرأس (1971)."]]}, {"id": "ct3", "title_en": "Why plain radiography is not enough", "title_ar": "ليه الأشعة العادية مش كفاية", "figs": ["svg_superimposition"], "blocks": [{"en": "<p>Conventional radiography has two written limitations:</p><ul><li><b>Superimposition</b>: structures overlap each other on the image.</li><li>Difficulty in distinguishing between <b>homogenous objects of non-uniform thickness</b>.</li></ul>", "ar": "<p>للأشعة التقليدية عيبان مكتوبين:</p><ul><li><b>التراكب (Superimposition)</b>: التراكيب بتتداخل فوق بعضها في الصورة.</li><li>صعوبة التمييز بين <b>أجسام متجانسة بسماكات غير منتظمة</b>.</li></ul>"}, {"en": "<p>Its <b>tissue-difference sensitivity</b> is only about <b>5%-10%</b>: two tissues must differ by at least that much before you can tell them apart.</p>", "ar": "<p><b>حساسيتها لفروق الأنسجة</b> حوالي <b>5%-10%</b> بس: يعني لازم نسيجين يختلفوا بالقدر ده على الأقل عشان تقدر تفرق بينهم.</p>"}], "terms": [["superimposition", "Overlying structures stacked on top of each other in a projection image.", "تراكب التراكيب فوق بعضها في صورة الإسقاط."], ["tissue-difference sensitivity", "The smallest tissue contrast difference a modality can show; radiography needs 5%-10%.", "أصغر فرق في تباين الأنسجة تقدر التقنية تظهره؛ الأشعة العادية محتاجة 5%-10%."]]}, {"id": "ct4", "title_en": "Conventional tomography", "title_ar": "التصوير المقطعي التقليدي", "figs": ["svg_blur", "svg_trajectories"], "blocks": [{"en": "<p>Conventional tomography <b>eliminates tissue superimposition</b> (the slide's word; more precisely it <b>reduces</b> it by blurring what is outside the focal plane) and <b>increases the contrast of low subject-contrast tissues</b>.</p>", "ar": "<p>التصوير المقطعي التقليدي <b>بيلغي التراكب</b> (دي كلمة السلايد؛ والأدق إنه <b>بيقلله</b> عن طريق تطمس اللي برة المستوى البؤري) و<b>بيزود تباين الأنسجة ضعيفة التباين</b>.</p>"}, {"en": "<p><b>Blurring principle:</b> the x-ray tube and the image receptor move in coordinated opposite directions around a pivot point called the <b>fulcrum</b>, which lies in the objective plane. Only points at the fulcrum keep the same position on the image receptor and stay sharp; everything above and below is blurred.</p>", "ar": "<p><b>مبدأ التطميس:</b> أنبوبة الأشعة ومستقبل الصورة بيتحركوا في اتجاهين متعاكسين متناسقين حوالين نقطة ارتكاز اسمها <b>الـ fulcrum</b>، اللي بتقع في المستوى الهدفي. النقط اللي عند الـ fulcrum بس هي اللي بتفضل في نفس المكان على المستقبل وبتطلع حادة؛ وكل اللي فوق وتحت بيتطمس.</p>"}, {"en": "<p><b>The five tube trajectories:</b> linear, elliptical, circular, spiral and hypocycloidal. (The spiral here is a tube path, not Spiral CT.)</p>", "ar": "<p><b>مسارات الأنبوبة الخمسة:</b> خطي، إهليجي، دائري، حلزوني، وتحت الدائري (hypocycloidal). (الحلزوني هنا مسار أنبوبة، مش Spiral CT.)</p>"}], "terms": [["fulcrum", "The pivot point in the objective plane; the only level that stays sharp during tomographic motion.", "نقطة الارتكاز في المستوى الهدفي؛ المستوى الوحيد اللي بيفضل حاد أثناء الحركة."], ["trajectory", "The path the x-ray tube follows during a tomographic exposure.", "المسار اللي بتمشيه أنبوبة الأشعة أثناء التعريض."]]}, {"id": "ct5", "title_en": "How the CT image is formed", "title_ar": "إزاي صورة الـ CT بتتكون", "figs": ["gantry3d"], "blocks": [{"en": "<p>A CT image is the result of <b>breaking apart a three-dimensional structure</b> and mathematically putting it back together again, displayed as a two-dimensional image on a screen.</p>", "ar": "<p>صورة الـ CT ناتج <b>تفكيك تركيب ثلاثي الأبعاد</b> وإعادة تركيبه رياضياً تاني، وبتتعرض كصورة ثنائية الأبعاد على الشاشة.</p>"}, {"en": "<p><b>The primary goal of any CT system</b> is to accurately reproduce the internal structures of the body as two-dimensional cross-sectional images. CT achieves this through its superior ability to <b>overcome superimposition</b> and to demonstrate <b>slight differences in tissue contrast</b>.</p>", "ar": "<p><b>الهدف الأساسي لأي نظام CT</b> هو إعادة إنتاج التراكيب الداخلية للجسم بدقة على شكل صور مقطعية ثنائية الأبعاد. والـ CT بيحقق ده بقدرته الفائقة على <b>التغلب على التراكب</b> وإظهار <b>الفروق الصغيرة في تباين الأنسجة</b>.</p>"}, {"en": "<p>Two factors play important roles in CT image formation: <b>collecting many projections</b> of the object, and <b>heavy filtration of the x-ray beam</b>.</p>", "ar": "<p>عاملان ليهم دور مهم في تكوين صورة الـ CT: <b>تجميع إسقاطات كتيرة</b> للجسم، و<b>الفلترة القوية لحزمة الأشعة</b>.</p>"}, {"en": "<p><b>Gantry parts to know:</b> x-ray source, x-ray fan beam, detector array, and the data acquisition system (DAS).</p>", "ar": "<p><b>أجزاء الـ gantry المطلوبة:</b> مصدر الأشعة، الحزمة المروحية (fan beam)، مجموعة الكواشف، ونظام تجميع البيانات (DAS).</p>"}], "terms": [["projection", "One set of transmission measurements through the object from one direction.", "مجموعة قياسات نفاذ عبر الجسم من اتجاه واحد."], ["DAS", "Data acquisition system: collects and digitizes the detector signals.", "نظام تجميع البيانات: بيجمع ويرقمن إشارات الكواشف."], ["fan beam", "The fan-shaped x-ray beam that covers the slice width.", "حزمة الأشعة على شكل مروحة بتغطي سماكة الشريحة."]]}, {"id": "ct6", "title_en": "CT advantages and limitations", "title_ar": "مميزات وحدود الـ CT", "figs": [], "blocks": [{"en": "<p><b>Advantages of CT:</b></p><ul><li>Three-dimensional image <b>free of superimposition</b>.</li><li><b>More sensitive to differences in tissue type</b>: about <b>1%</b>, compared with about 10% for radiography.</li><li>Ability to <b>manipulate and adjust the image after scanning</b> (digital technology).</li></ul>", "ar": "<p><b>مميزات الـ CT:</b></p><ul><li>صورة ثلاثية الأبعاد <b>خالية من التراكب</b>.</li><li><b>أكثر حساسية لفروق نوع النسيج</b>: حوالي <b>1%</b> مقارنة بحوالي 10% للأشعة العادية.</li><li>إمكانية <b>تعديل ومعالجة الصورة بعد المسح</b> (تقنية رقمية).</li></ul>"}, {"en": "<p><b>Limitation:</b> unable to differentiate between tissues with slight contrast differences <b>below 1%</b>. (Keep 1% as the lecture's comparison number; the exact value in practice depends on object size, noise, dose and settings.)</p>", "ar": "<p><b>الحد:</b> مش بيقدر يفرق بين أنسجة فروق التباين بينها <b>أقل من 1%</b>. (احفظ 1% كرقم مقارنة من المحاضرة؛ القيمة الفعلية عملياً بتعتمد على حجم الجسم والضوضاء والجرعة والإعدادات.)</p>"}], "terms": [["1% vs 10%", "CT separates tissue differences of about 1%; conventional radiography needs 5%-10%.", "الـ CT بيفرق فروق أنسجة حوالي 1%؛ الأشعة العادية محتاجة 5%-10%."]]}, {"id": "ct7", "title_en": "CT compared with MRI", "title_ar": "مقارنة الـ CT بالـ MRI", "figs": ["svg_mrict"], "blocks": [{"en": "<p>Comparing the <b>appearance of images</b>: <b>MRI visualizes more soft tissue detail without contrast media</b>.</p>", "ar": "<p>بمقارنة <b>مظهر الصور</b>: <b>الـ MRI بيوضح تفاصيل الأنسجة الرخوة أكتر من غير مادة تباين</b>.</p>"}], "terms": [["MRI", "Magnetic resonance imaging; shows more soft-tissue detail than CT without contrast media.", "الرنين المغناطيسي؛ بيوضح الأنسجة الرخوة أكتر من الـ CT من غير صبغة."]]}, {"id": "ct8", "title_en": "Goals of CT", "title_ar": "أهداف الـ CT", "figs": [], "blocks": [{"en": "<p>The lecture closes with three goals of CT:</p><ul><li><b>Minimal superimposition.</b></li><li><b>Image contrast improvement.</b></li><li><b>Small tissue-difference recording.</b></li></ul>", "ar": "<p>المحاضرة بتقفل بتلات أهداف للـ CT:</p><ul><li><b>أقل تراكب ممكن.</b></li><li><b>تحسين تباين الصورة.</b></li><li><b>تسجيل فروق الأنسجة الصغيرة.</b></li></ul>"}], "terms": []}], "flash": [{"f": "Tomography: word origin", "b": "Greek: tomo = cross-section, layer, cut; graph = something written or drawn."}, {"f": "TAT, CAT, CT", "b": "TAT = Transverse Axial Tomography (1937) - renamed CAT after the digital computer processed the images - then abbreviated to CT."}, {"f": "CTAT and DAT", "b": "Computerized transaxial tomography; digital axial tomography. Other names for CT."}, {"f": "Definition of CT", "b": "The science that creates 2D cross-sectional images from 3D body structures; 2D images can be reconstructed to different viewing modes."}, {"f": "Cormack, 1963", "b": "Developed the mathematical method of reconstructing images from x-ray projections."}, {"f": "Hounsfield, 1971", "b": "EMI engineer who developed the first clinically useful CT scanner (first head scanner at Atkinson-Morley Hospital, Wimbledon)."}, {"f": "Nobel Prize, 1979", "b": "Hounsfield and Cormack shared the Nobel Prize in medicine for the development of CT."}, {"f": "Two limitations of plain radiography", "b": "Superimposition; difficulty distinguishing homogenous objects of non-uniform thickness."}, {"f": "Radiography tissue sensitivity", "b": "About 5%-10%."}, {"f": "Conventional tomography", "b": "Eliminates (reduces by blurring) tissue superimposition and increases contrast of low subject-contrast tissues."}, {"f": "Five tube trajectories", "b": "Linear, elliptical, circular, spiral, hypocycloidal."}, {"f": "Fulcrum principle", "b": "Tube and receptor move around the fulcrum (objective plane); only the fulcrum plane keeps the same position on the receptor and stays sharp."}, {"f": "Primary goal of any CT system", "b": "Accurately reproduce the internal structures of the body as 2D cross-sectional images."}, {"f": "Two factors in CT image formation", "b": "Collecting many projections of the object; heavy filtration of the x-ray beam."}, {"f": "Four labeled gantry parts", "b": "X-ray source, x-ray fan beam, detector array, data acquisition system (DAS)."}, {"f": "Three CT advantages", "b": "3D image free of superimposition; more sensitive to tissue differences (1% vs 10%); image can be manipulated after scanning."}, {"f": "CT limitation", "b": "Cannot differentiate tissues with contrast differences below 1%."}, {"f": "CT vs MRI", "b": "MRI visualizes more soft tissue detail without contrast media."}, {"f": "Three goals of CT", "b": "Minimal superimposition; image contrast improvement; small tissue-difference recording."}], "quiz": [{"q": "The word \"tomo\" in tomography comes from the Greek for:", "o": ["Speed", "Light", "Cross-section, layer or cut", "Computer"], "a": 2, "w": "TOMO = مقطع أو شريحة، وgraph = كتابة أو رسم."}, {"q": "Which is NOT an alternative name for CT?", "o": ["DAT (digital axial tomography)", "CTAT (computerized transaxial tomography)", "MRT (magnetic resonance tomography)", "CAT (computerized axial tomography)"], "a": 2, "w": "الأسماء القديمة: CAT وCTAT وDAT. MRT شيء مختلف."}, {"q": "Computed tomography creates:", "o": ["Two-dimensional cross-sectional images from three-dimensional body structures", "Three-dimensional images from 2D structures", "Only projection images", "Only sound-based images"], "a": 0, "w": "CT بيحول جسم 3D لصور مقطعية 2D."}, {"q": "Who developed the first clinically useful CT scanner in 1971 at EMI?", "o": ["Godfrey Hounsfield", "Wilhelm Roentgen", "Paul Lauterbur", "Alan Cormack"], "a": 0, "w": "Hounsfield اخترع الجهاز في EMI. Cormack صاحب الرياضيات."}, {"q": "Alan Cormack's contribution in 1963 was:", "o": ["A mathematical method for reconstructing images from x-ray projections", "The first clinical scanner", "Contrast media", "The x-ray tube"], "a": 0, "w": "Cormack = الرياضيات، Hounsfield = الجهاز."}, {"q": "Hounsfield and Cormack shared the Nobel Prize in medicine in:", "o": ["1990", "1895", "1971", "1979"], "a": 3, "w": "جائزة نوبل 1979."}, {"q": "Which is a limitation of conventional radiography that CT overcomes?", "o": ["Use of film", "Superimposition of structures", "Use of x-rays", "Digital images"], "a": 1, "w": "أهم عيوب الراديوجرافي التراكب (superimposition)."}, {"q": "Conventional radiography can distinguish tissue differences of about:", "o": ["0.1%", "1%", "5-10%", "50%"], "a": 2, "w": "الراديوجرافي بيفرق 5-10% بس، والـ CT حوالي 1%."}, {"q": "CT is more sensitive to tissue differences than radiography. The lecture compares:", "o": ["1% versus 10%", "50% versus 5%", "0.1% versus 100%", "10% versus 1%"], "a": 0, "w": "CT حوالي 1% مقابل 10% للراديوجرافي."}, {"q": "Conventional tomography:", "o": ["Completely removes all structures outside the plane", "Reduces superimposition by blurring structures outside the focal plane", "Is the same as CT", "Uses no x-ray tube movement"], "a": 1, "w": "الـ tomography التقليدي بيعمل blur للي برة المستوى (السلايد قال eliminates لكن الأدق reduces)."}, {"q": "Which is NOT one of the five tube trajectories in conventional tomography?", "o": ["Elliptical", "Linear", "Hypocycloidal", "Parabolic"], "a": 3, "w": "الخمسة: Linear وElliptical وCircular وSpiral وHypocycloidal."}, {"q": "In the tomographic blurring principle, the structure that stays in the same position on the image receptor is the:", "o": ["Tube", "Fulcrum (objective plane)", "Skin", "Table"], "a": 1, "w": "الـ fulcrum هو النقطة اللي تفضل ثابتة وواضحة."}, {"q": "Which is an advantage of CT?", "o": ["Lower dose than radiography always", "No superimposition but 2D only with no reconstruction", "Cheap equipment", "Ability to manipulate and adjust the image after scanning"], "a": 3, "w": "ميزة CT: معالجة الصورة بعد المسح (digital)."}, {"q": "Which modality shows more soft tissue detail without contrast media according to the lecture?", "o": ["Plain radiography", "MRI", "Conventional tomography", "Fluoroscopy"], "a": 1, "w": "الـ MRI بيوضح soft tissue من غير contrast."}, {"q": "Which is one of the goals of CT?", "o": ["Eliminating the x-ray tube", "Maximum superimposition", "Minimal superimposition, contrast improvement and recording small tissue differences", "Lowest spatial resolution"], "a": 2, "w": "أهداف CT: أقل superimposition وتحسين contrast وتسجيل فروق صغيرة."}], "recall": [{"q": "What does the word tomography mean?", "a": "From Greek: tomo = cross-section/layer/cut, graph = something written or drawn; recording a slice.", "w": "tomo مقطع + graph رسم/تسجيل."}, {"q": "What do TAT, CAT, and CT stand for in the naming history?", "a": "TAT = transverse axial tomography (1937); CAT = computerized axial tomography after a digital computer processed the images; then abbreviated to CT.", "w": "نفس التقنية، أسماء تاريخية مختلفة."}, {"q": "Define computed tomography.", "a": "The science that creates two-dimensional cross-sectional images from three-dimensional body structures; the 2D images can be reconstructed into different viewing modes.", "w": "الجسم زي رغيف وكل صورة شريحة منه."}, {"q": "Who developed the mathematics of CT reconstruction, and who built the first clinically useful scanner?", "a": "Alan Cormack developed the mathematical method in 1963; Godfrey Hounsfield (EMI engineer) built the first clinically useful scanner in 1971; they shared the 1979 Nobel Prize.", "w": "كورماك رياضيات، هاونسفيلد الجهاز. واشتغلوا مستقلين عن بعض."}, {"q": "Where and when was the first clinical CT head scanner installed?", "a": "In 1971 at Atkinson-Morley Hospital in Wimbledon, England.", "w": "١٩٧١، إنجلترا."}, {"q": "Name the two written limitations of plain radiography.", "a": "Superimposition, and difficulty distinguishing homogenous objects of non-uniform thickness.", "w": "تراكب، وصعوبة التمييز لو نفس المادة بسماكات مختلفة."}, {"q": "What tissue difference is needed to be visible on plain radiography?", "a": "About 5%-10%.", "w": "رقم للحفظ، وهتقارنه بالـ ١٪ بتاعة الـ CT."}, {"q": "What does conventional tomography do to superimposition?", "a": "It reduces it (keeps a selected plane sharp while blurring structures above and below) and increases contrast of low subject contrast tissues.", "w": "السلايد كاتب eliminates، والأدق reduces: بيطمس مش بيلغي."}, {"q": "Name the five tube trajectories in conventional tomography.", "a": "Linear, elliptical, circular, spiral, hypocycloidal.", "w": "خمس مسارات لحركة الأنبوبة، والحلزوني هنا مش Spiral CT."}, {"q": "Explain the tomographic blurring principle (fulcrum).", "a": "The tube and image receptor move in coordinated opposite directions around the fulcrum (pivot point) in the objective plane; only the fulcrum plane keeps the same position on the receptor and stays sharp, other points blur.", "w": "نقطة الارتكاز بس اللي بتفضل واضحة."}, {"q": "What is the primary goal of any CT system?", "a": "To accurately reproduce the internal structures of the body as two-dimensional cross-sectional images.", "w": "إعادة إنتاج التراكيب الداخلية بدقة في صور مقطعية."}, {"q": "Which two factors play important roles in CT image formation?", "a": "Collecting many projections of the object, and heavy filtration of the x-ray beam.", "w": "قياسات من اتجاهات كتير + فلترة قوية بتشيل الفوتونات ضعيفة الطاقة."}, {"q": "Name the four labeled parts of the CT gantry.", "a": "X-ray source, x-ray fan beam, detector array, data acquisition system (DAS).", "w": "مصدر، حزمة مروحية، كواشف، ونظام تجميع البيانات."}, {"q": "What are the three advantages of CT?", "a": "1) Three-dimensional image free of superimposition. 2) More sensitive to tissue type differences (1% compared with 10%). 3) Ability to manipulate and adjust the image after scanning (digital technology).", "w": "بدون تراكب، حساسية ١٪، وتعديل بعد التصوير."}, {"q": "What is the stated limitation of CT (and the correction)?", "a": "Unable to differentiate tissues with contrast differences below 1% (as a lecture comparison number; in practice around 0.5% is possible depending on object size, noise, dose, and settings).", "w": "احفظ ١٪ كرقم مقارنة، مش قانون ثابت."}, {"q": "CT vs MRI in image appearance?", "a": "MRI visualizes more soft tissue detail without contrast media.", "w": "MRI أقوى في الأنسجة الرخوة من غير صبغة."}, {"q": "What are the three goals of CT?", "a": "Minimal superimposition, image contrast improvement, small tissue difference recording.", "w": "خلاصة المحاضرة في تلاتة."}]}, "bio": {"name": "Radiobiology", "lec": "Lecture 1 - Introduction to Radiobiology", "short": "Radio", "sections": [{"id": "bio1", "title_en": "Introduction: cells and tissues", "title_ar": "مقدمة: الخلايا والأنسجة", "figs": [], "blocks": [{"en": "<p>The human body is composed of approximately <b>75 trillion cells</b>. These cells are organized into only <b>four categories called tissues</b>.</p>", "ar": "<p>جسم الإنسان مكون من حوالي <b>75 تريليون خلية</b>. الخلايا دي متنظمة في <b>أربع فئات بس اسمها الأنسجة</b>.</p>"}, {"en": "<p><b>Tissue:</b> a group of cells which are similar in structure and which perform common or related functions.</p>", "ar": "<p><b>النسيج:</b> مجموعة خلايا متشابهة في التركيب وبتؤدي وظائف مشتركة أو مترابطة.</p>"}, {"en": "<p><b>Histology:</b> the study of tissues.</p>", "ar": "<p><b>الهيستولوجيا:</b> علم دراسة الأنسجة.</p>"}, {"en": "<p>The four basic types: <b>epithelial, connective, muscle and nervous tissue</b>.</p>", "ar": "<p>الأنواع الأربعة الأساسية: <b>النسيج الظهاري، والضام، والعضلي، والعصبي</b>.</p>"}], "terms": [["tissue", "Group of cells similar in structure performing common or related functions.", "مجموعة خلايا متشابهة التركيب بتؤدي وظائف مشتركة."], ["histology", "The study of tissues.", "علم دراسة الأنسجة."], ["75 trillion", "Approximate number of cells in the human body.", "عدد خلايا جسم الإنسان التقريبي."]]}, {"id": "bio2", "title_en": "Epithelial tissue", "title_ar": "النسيج الظهاري", "figs": ["epi3d"], "blocks": [{"en": "<p><b>Locations:</b> covers the body; lines the cavities, tubes, ducts and blood vessels inside the body; covers the organs inside body cavities.</p>", "ar": "<p><b>الأماكن:</b> بيغطي الجسم؛ وبيبطن التجاويف والأنابيب والقنوات والأوعية الدموية جوه الجسم؛ وبيغطي الأعضاء جوه تجاويف الجسم.</p>"}, {"en": "<p><b>Functions:</b></p><ul><li>Protection from physical and chemical injury.</li><li>Protection against microbial invasion.</li><li>Contains receptors which respond to stimuli.</li><li>Filters, secretes and reabsorbs materials.</li><li>Secretes serous fluids to lubricate structures.</li></ul>", "ar": "<p><b>الوظائف:</b></p><ul><li>الحماية من الإصابة الفيزيائية والكيميائية.</li><li>الحماية ضد الغزو الميكروبي.</li><li>فيه مستقبلات بتستجيب للمؤثرات.</li><li>بيصفّي ويفرز ويعيد امتصاص المواد.</li><li>يفرز سوائل مصلية لتزليق التراكيب.</li></ul>"}, {"en": "<p>By number of layers, epithelium is classified as <b>simple</b> (a single layer of cells) or <b>stratified</b> (many layers).</p>", "ar": "<p>حسب عدد الطبقات، الظهارة بتتصنف <b>بسيطة</b> (طبقة خلية واحدة) أو <b>مطبقة</b> (طبقات كتيرة).</p>"}], "terms": [["simple epithelium", "One layer of cells.", "ظهارة من طبقة واحدة."], ["stratified epithelium", "Many layers of cells.", "ظهارة من طبقات كتيرة."], ["serous fluid", "Watery lubricating secretion of epithelial membranes.", "سائل مصلي مائي بيزلّق الأغشية."]]}, {"id": "bio3", "title_en": "Connective tissue", "title_ar": "النسيج الضام", "figs": ["svg_connective"], "blocks": [{"en": "<p>Connective tissue is the <b>most abundant and widely distributed</b> tissue in the body.</p>", "ar": "<p>النسيج الضام هو <b>أكتر نسيج موجود ومنتشر</b> في الجسم.</p>"}, {"en": "<p><b>Functions:</b> connects, binds and supports structures (tendons, ligaments); protects and cushions organs and tissues; insulates (fat); transports substances (blood).</p>", "ar": "<p><b>الوظائف:</b> بيربط ويدعم التراكيب (الأوتار والأربطة)؛ بيحمي ويدعم الأعضاء والأنسجة؛ بيعزل (الدهون)؛ وبينقل المواد (الدم).</p>"}, {"en": "<p><b>Classification:</b></p><ul><li><b>Connective tissue proper:</b> loose (areolar, adipose, reticular) and dense (regular, irregular, elastic).</li><li><b>Supporting connective tissue:</b> cartilage (hyaline, fibrocartilage, elastic) and bone (compact, spongy).</li><li><b>Fluid connective tissue:</b> blood.</li></ul>", "ar": "<p><b>التصنيف:</b></p><ul><li><b>النسيج الضام الأصلي:</b> رخو (هالي، دهني، شبكي) وكثيف (منتظم، غير منتظم، مرن).</li><li><b>النسيج الضام الداعم:</b> غضروف (زجاجي، ليفي، مرن) وعظم (متراص، إسفنجي).</li><li><b>النسيج الضام السائل:</b> الدم.</li></ul>"}], "terms": [["connective tissue", "Most abundant and widely distributed tissue; connects, supports, cushions, insulates and transports.", "أكتر الأنسجة انتشاراً؛ يربط ويدعم ويحمي ويعزل وينقل."], ["loose connective tissue", "Areolar, adipose and reticular.", "هالي ودهني وشبكي."], ["dense connective tissue", "Regular, irregular and elastic.", "منتظم وغير منتظم ومرن."]]}, {"id": "bio4", "title_en": "Muscle tissue", "title_ar": "النسيج العضلي", "figs": ["skel3d", "card3d", "smooth3d"], "blocks": [{"en": "<p><b>Locations:</b> associated with the bones of the skeleton, the heart, and the walls of the hollow organs.</p>", "ar": "<p><b>الأماكن:</b> مرتبط بعظام الهيكل، والقلب، وجدران الأعضاء المجوفة.</p>"}, {"en": "<p><b>Functions:</b> movement, locomotion, maintains posture, produces heat, facial expressions, pumps blood.</p>", "ar": "<p><b>الوظائف:</b> الحركة، والتنقل، والحفاظ على وضعية الجسم، وإنتاج الحرارة، وتعبيرات الوجه، وضخ الدم.</p>"}, {"en": "<p><b>Cardiac muscle:</b> cells are short, bifurcated and striated, with one or two centrally located nuclei and <b>intercalated discs</b> between cells. Involuntary contraction and relaxation pump blood; located in the heart wall (myocardium).</p>", "ar": "<p><b>العضلة القلبية:</b> خلاياها قصيرة ومتفرعة ومخططة، بنواة أو نواتين في المنتصف و<b>أقراص مقحمة (intercalated discs)</b> بين الخلايا. انقباض لا إرادي بيضخ الدم؛ ومكانها جدار القلب (الميوكارديوم).</p>"}, {"en": "<p><b>Smooth muscle:</b> cells are fusiform (spindle-shaped), short and nonstriated, with one centrally located nucleus. Involuntary movements that move materials through internal organs; found in the walls of hollow organs such as vessels, airways, stomach, bladder and uterus.</p>", "ar": "<p><b>العضلة الملساء:</b> خلاياها مغزلية الشكل، قصيرة وغير مخططة، بنواة واحدة في المنتصف. حركات لا إرادية بتنقل المواد عبر الأعضاء الداخلية؛ موجودة في جدران الأعضاء المجوفة زي الأوعية والمجاري الهوائية والمعدة والمثانة والرحم.</p>"}], "terms": [["intercalated discs", "Junctions between cardiac muscle cells.", "الوصلات بين خلايا عضلة القلب."], ["fusiform", "Spindle-shaped: thick in the middle, tapered at both ends.", "مغزلي: سميك في النص ومدبب من الطرفين."], ["striated", "Showing light and dark bands under the microscope.", "مخطط: خطوط فاتحة وغامقة تحت الميكروسكوب."]]}, {"id": "bio5", "title_en": "Nervous tissue", "title_ar": "النسيج العصبي", "figs": ["neuron3d"], "blocks": [{"en": "<p>Nervous tissue contains two types of cells:</p><ul><li><b>Neurons:</b> nerve cells that are capable of <b>initiating and conducting electrical activity</b> throughout the body.</li><li><b>Neuroglia:</b> cells that <b>support the neurons</b>.</li></ul>", "ar": "<p>النسيج العصبي فيه نوعين من الخلايا:</p><ul><li><b>العصبونات (Neurons):</b> خلايا عصبية قادرة على <b>بدء وتوصيل النشاط الكهربي</b> في الجسم كله.</li><li><b>الخلايا الدبقية (Neuroglia):</b> خلايا <b>بتدعم العصبونات</b>.</li></ul>"}, {"en": "<p>Nervous tissue is the main component of the nervous system: the brain, spinal cord and nerves.</p>", "ar": "<p>النسيج العصبي هو المكون الرئيسي للجهاز العصبي: المخ والحبل الشوكي والأعصاب.</p>"}, {"en": "<p><b>Functions:</b> regulates and controls body functions; generates and transmits nerve impulses; supports, insulates and protects the impulse-generating neurons.</p>", "ar": "<p><b>الوظائف:</b> ينظم ويتحكم في وظائف الجسم؛ يولد وينقل النبضات العصبية؛ يدعم ويعزل ويحمي العصبونات المولدة للنبضات.</p>"}], "terms": [["neuron", "Nerve cell that initiates and conducts electrical activity.", "خلية عصبية بتبدأ وتوصل النشاط الكهربي."], ["neuroglia", "Supporting cells of nervous tissue.", "الخلايا الداعمة للنسيج العصبي."]]}, {"id": "bio6", "title_en": "Tissue change and aging", "title_ar": "تغير الأنسجة والشيخوخة", "figs": [], "blocks": [{"en": "<p>Tissues can undergo change in form, size or number during the aging process:</p><ul><li><b>Hypertrophy:</b> an increase in the <b>size</b> of existing cells.</li><li><b>Hyperplasia:</b> an increase in the <b>number</b> of cells in a tissue.</li><li><b>Neoplasia:</b> out-of-control growth, which forms a <b>tumor</b>.</li><li><b>Atrophy:</b> <b>shrinkage</b> of tissue by cell size or number.</li></ul>", "ar": "<p>الأنسجة ممكن يتغير شكلها أو حجمها أو عددها مع الشيخوخة:</p><ul><li><b>التضخم (Hypertrophy):</b> زيادة في <b>حجم</b> الخلايا الموجودة.</li><li><b>التزايد (Hyperplasia):</b> زيادة في <b>عدد</b> الخلايا في النسيج.</li><li><b>الورم (Neoplasia):</b> نمو خارج السيطرة بيكوّن <b>ورم</b>.</li><li><b>الضمور (Atrophy):</b> <b>انكماش</b> النسيج في حجم الخلايا أو عددها.</li></ul>"}], "terms": [["hypertrophy", "Increase in the size of existing cells.", "زيادة حجم الخلايا الموجودة."], ["hyperplasia", "Increase in the number of cells in a tissue.", "زيادة عدد الخلايا في النسيج."], ["neoplasia", "Out-of-control growth forming a tumor.", "نمو خارج السيطرة يكوّن ورم."], ["atrophy", "Shrinkage of tissue by cell size or number.", "انكماش النسيج في حجم الخلية أو عددها."]]}, {"id": "bio7", "title_en": "Cell types: eukaryotic and prokaryotic", "title_ar": "أنواع الخلايا: حقيقية وأولية النواة", "figs": ["euk3d", "prok3d"], "blocks": [{"en": "<p>Cells are divided into <b>eukaryotic</b> (eu-karyote = with a nucleus) and <b>prokaryotic</b> (pro-karyote = without a nucleus).</p>", "ar": "<p>الخلايا بتتقسم لـ <b>حقيقية النواة (Eukaryotic)</b> يعني ليها نواة، و<b>أولية النواة (Prokaryotic)</b> يعني من غير نواة.</p>"}, {"en": "<p><b>Prokaryotic cells:</b> small cells, always unicellular; no nucleus or any membrane-bound organelles; DNA is circular, without proteins; small 70S ribosomes; no cytoskeleton; division by binary fission; reproduction is always asexual.</p>", "ar": "<p><b>الخلايا أولية النواة:</b> خلايا صغيرة، دايماً وحيدة الخلية؛ مفيش نواة ولا عضيات محاطة بأغشية؛ الـ DNA دائري من غير بروتينات؛ ريبوسومات صغيرة 70S؛ مفيش هيكل خلوي؛ الانقسام بالانشطار الثنائي؛ والتكاثر دايماً لا جنسي.</p>"}, {"en": "<p><b>Eukaryotic cells:</b> larger cells, often multicellular; always have a nucleus and other membrane-bound organelles; DNA is linear and associated with proteins to form chromatin; large 80S ribosomes; always have a cytoskeleton; division by mitosis or meiosis; reproduction is asexual or sexual.</p>", "ar": "<p><b>الخلايا حقيقية النواة:</b> خلايا أكبر، غالباً متعددة الخلايا؛ دايماً ليها نواة وعضيات محاطة بأغشية؛ الـ DNA خطي ومرتبط ببروتينات يكوّن الكروماتين؛ ريبوسومات كبيرة 80S؛ دايماً فيها هيكل خلوي؛ الانقسام ميتوزي أو ميوزي؛ والتكاثر لا جنسي أو جنسي.</p>"}, {"en": "<p class=\"note\"><b>Correction:</b> the summary table in the slides gives the sizes as \"&lt; 5 nm\" and \"&gt; 10 nm\". The intended unit is micrometers (µm), not nanometers.</p>", "ar": "<p class=\"note\"><b>تصحيح:</b> جدول المقارنة في السلايدات كاتب الأحجام \"&lt; 5 nm\" و\"&gt; 10 nm\". الوحدة المقصودة هي الميكرومتر (µm) مش النانومتر.</p>"}], "terms": [["eukaryote", "Cell with a true nucleus and membrane-bound organelles.", "خلية ليها نواة حقيقية وعضيات محاطة بأغشية."], ["prokaryote", "Cell without a nucleus or membrane-bound organelles.", "خلية من غير نواة ولا عضيات محاطة بأغشية."], ["chromatin", "Linear DNA associated with proteins in eukaryotic cells.", "الـ DNA الخطي المرتبط بالبروتينات في حقيقيات النواة."], ["binary fission", "Asexual cell division of prokaryotes.", "الانشطار الثنائي اللاجنسي في أوليات النواة."]]}], "flash": [{"f": "Cells of the body", "b": "About 75 trillion cells, organized into only four categories called tissues."}, {"f": "Tissue (definition)", "b": "A group of cells which are similar in structure and perform common or related functions."}, {"f": "Histology", "b": "The study of tissues."}, {"f": "The four tissue types", "b": "Epithelial, connective, muscle, nervous."}, {"f": "Epithelial tissue: locations", "b": "Covers the body; lines cavities, tubes, ducts and blood vessels; covers organs inside body cavities."}, {"f": "Epithelial tissue: functions", "b": "Protection (physical, chemical, microbial); receptors responding to stimuli; filters, secretes and reabsorbs; secretes serous lubricating fluids."}, {"f": "Simple vs stratified epithelium", "b": "Simple = one layer of cells; stratified = many layers."}, {"f": "Connective tissue", "b": "The most abundant and widely distributed tissue in the body."}, {"f": "Connective tissue: functions", "b": "Connects, binds and supports (tendons, ligaments); protects and cushions; insulates (fat); transports (blood)."}, {"f": "Connective tissue classification", "b": "Proper (loose: areolar, adipose, reticular; dense: regular, irregular, elastic); supporting (cartilage, bone); fluid (blood)."}, {"f": "Muscle tissue: functions", "b": "Movement, locomotion, posture, heat production, facial expressions, pumping blood."}, {"f": "Cardiac muscle", "b": "Short, bifurcated, striated cells; 1-2 central nuclei; intercalated discs; involuntary; heart wall (myocardium)."}, {"f": "Smooth muscle", "b": "Fusiform, short, nonstriated cells; one central nucleus; involuntary; walls of hollow organs."}, {"f": "Neurons vs neuroglia", "b": "Neurons initiate and conduct electrical activity; neuroglia support the neurons."}, {"f": "Nervous tissue: functions", "b": "Regulates and controls body functions; generates and transmits nerve impulses; supports, insulates and protects neurons."}, {"f": "Hypertrophy vs hyperplasia", "b": "Hypertrophy = increase in cell size; hyperplasia = increase in cell number."}, {"f": "Neoplasia vs atrophy", "b": "Neoplasia = out-of-control growth (tumor); atrophy = shrinkage of tissue."}, {"f": "Prokaryotic cell", "b": "No nucleus or membrane-bound organelles; circular DNA without proteins; 70S ribosomes; no cytoskeleton; binary fission; always unicellular and asexual."}, {"f": "Eukaryotic cell", "b": "Nucleus + membrane-bound organelles; linear DNA with proteins (chromatin); 80S ribosomes; cytoskeleton; mitosis or meiosis; often multicellular."}], "quiz": [{"q": "Approximately how many cells make up the human body, and into how many tissue categories are they organized?", "o": ["About 75 million cells, 3 tissue types", "About 75 trillion cells, 4 tissue types", "About 75 billion cells, 4 tissue types", "About 75 trillion cells, 6 tissue types"], "a": 1, "w": "الجسم حوالي 75 تريليون خلية متنظمة في 4 أنواع أنسجة بس."}, {"q": "Histology is best defined as the study of:", "o": ["Individual cells only", "Ionizing radiation effects", "Organ systems", "Tissues"], "a": 3, "w": "Histology = علم الأنسجة، والنسيج مجموعة خلايا متشابهة في التركيب والوظيفة."}, {"q": "Which of the following is NOT one of the four basic tissue types?", "o": ["Nervous tissue", "Muscle tissue", "Glandular tissue", "Epithelial tissue"], "a": 2, "w": "الأربعة: Epithelial وConnective وMuscle وNervous. Glandular مش نوع رئيسي."}, {"q": "Which of these is a function of epithelial tissue?", "o": ["Pumping blood", "Protection against microbial invasion and secretion of serous fluids", "Generating nerve impulses", "Storing minerals in a solid matrix"], "a": 1, "w": "الـ epithelium بيغطي ويبطّن ويحمي ويفرز ويمتص. النبضات للعصبي والضخ للقلب."}, {"q": "Epithelium made of many layers of cells is classified as:", "o": ["Apical", "Basal", "Simple", "Stratified"], "a": 3, "w": "Simple = طبقة واحدة، Stratified = طبقات كتير. Apical وBasal أسطح مش أنواع."}, {"q": "Which is the most abundant and widely distributed tissue in the body?", "o": ["Connective tissue", "Muscle tissue", "Epithelial tissue", "Nervous tissue"], "a": 0, "w": "الـ Connective هو الأكتر انتشاراً (يربط ويدعم ويحمي وينقل)."}, {"q": "In the classification of connective tissue, blood belongs to:", "o": ["Fluid connective tissue", "Dense connective tissue", "Loose connective tissue", "Supporting connective tissue"], "a": 0, "w": "الدم = fluid connective. الغضروف والعظم = supporting."}, {"q": "Which of these is a type of loose connective tissue?", "o": ["Hyaline cartilage", "Adipose tissue", "Elastic dense tissue", "Compact bone"], "a": 1, "w": "Loose = Areolar وAdipose وReticular. Hyaline غضروف وCompact عظم."}, {"q": "Which cells in nervous tissue initiate and conduct electrical activity?", "o": ["Neurons", "Adipocytes", "Fibroblasts", "Neuroglia"], "a": 0, "w": "الـ Neurons بتبدأ وتوصل الإشارة، والـ Neuroglia بتدعمها بس."}, {"q": "A muscle with short, bifurcated, striated cells, one or two central nuclei and intercalated discs is:", "o": ["Smooth muscle", "Neuroglia", "Cardiac muscle", "Skeletal muscle"], "a": 2, "w": "Intercalated discs علامة العضلة القلبية."}, {"q": "Which description fits smooth muscle?", "o": ["Cells with axons and dendrites", "Fusiform, short, nonstriated, one central nucleus", "Long striated fibers with many peripheral nuclei", "Branched, striated, with intercalated discs"], "a": 1, "w": "Smooth = مغزلية الشكل وبدون striations ونواة واحدة في النص."}, {"q": "An increase in the NUMBER of cells in a tissue is called:", "o": ["Neoplasia", "Hypertrophy", "Hyperplasia", "Atrophy"], "a": 2, "w": "Hyperplasia = زيادة العدد. Hypertrophy = زيادة الحجم."}, {"q": "Out-of-control cell growth that forms a tumor is called:", "o": ["Neoplasia", "Hyperplasia", "Atrophy", "Hypertrophy"], "a": 0, "w": "Neoplasia = نمو خارج السيطرة وبيكوّن ورم. Atrophy = ضمور."}, {"q": "Which statement about prokaryotic cells is correct?", "o": ["They divide by mitosis or meiosis", "DNA is linear and forms chromatin", "They have a nucleus and membrane-bound organelles", "DNA is circular without proteins and division is by binary fission"], "a": 3, "w": "Prokaryotic: DNA دائري، 70S، من غير نواة. الباقي صفات eukaryotic."}, {"q": "In the lecture summary table, cell sizes are given as \"< 5 nm\" and \"> 10 nm\". What is the correct unit?", "o": ["cm (centimeters)", "pm (picometers)", "µm (micrometers)", "mm (millimeters)"], "a": 2, "w": "الوحدة الصح µm، والسلايد غلطان في كتابتها nm."}], "recall": [{"q": "Approximately how many cells make up the human body?", "a": "About 75 trillion cells.", "w": "احفظ الرقم: حوالي ٧٥ تريليون خلية."}, {"q": "Into how many categories are all body cells organized, and what are these categories called?", "a": "Only four categories, called tissues.", "w": "٧٥ تريليون خلية متنظمة في ٤ أنسجة بس."}, {"q": "Define \"tissue\".", "a": "A group of cells which are similar in structure and perform common or related functions.", "w": "مجموعة خلايا متشابهة في التركيب وبتعمل وظائف مشتركة أو مترابطة. التعريف بييجي في الامتحان زي ما هو."}, {"q": "What is histology?", "a": "The study of tissues.", "w": "علم الأنسجة."}, {"q": "Name the four basic types of tissues.", "a": "Epithelial, connective, muscle, and nervous tissue.", "w": "الطلائي (الظهاري)، الضام، العضلي، العصبي. احفظهم بالترتيب."}, {"q": "What is the difference between simple and stratified epithelium?", "a": "Simple epithelium = one layer of cells; stratified epithelium = several layers.", "w": "Simple صف واحد، Stratified صفوف كتير."}, {"q": "On an epithelial cell, what do apical, basal, and lateral surfaces mean?", "a": "Apical faces the open space, basal sits on the basement membrane, lateral faces neighboring cells.", "w": "القمة ناحية الفراغ، القاعدة على الغشاء القاعدي، والجوانب ناحية الخلايا الجيران."}, {"q": "Which tissue is the most abundant and widely distributed in the body?", "a": "Connective tissue.", "w": "النسيج الضام هو الأكثر وفرة والأوسع انتشاراً."}, {"q": "Name the main functions of connective tissue.", "a": "Connects, binds and supports structures (tendons, ligaments); protects and cushions organs; insulates (fat); transports substances (blood).", "w": "يربط ويدعم، يحمي ويبطّن، يعزل حرارياً بالدهون، وينقل المواد عن طريق الدم. خد بالك: الدم نفسه نسيج ضام."}, {"q": "What is the common embryonic origin of all connective tissues?", "a": "Mesenchyme.", "w": "الميزنشيم، النسيج الجنيني الأصلي لكل الأنسجة الضامة."}, {"q": "What are the three branches of connective tissue classification?", "a": "Connective tissue proper (loose + dense), supporting connective tissue (cartilage + bone), and fluid connective tissue (blood).", "w": "أصل واحد (mesenchyme) لتلات فروع: proper و supporting و fluid."}, {"q": "What is the direction of the signal through a neuron?", "a": "Dendrite -> cell body -> axon.", "w": "التفرعات الشجيرية تستقبل، جسم الخلية فيه النواة، والمحور يوصّل الإشارة بره."}, {"q": "Which germ layers give rise to epithelial tissue (Table 4.1)?", "a": "All three: ectoderm, mesoderm, and endoderm.", "w": "الطلائي بس اللي بيطلع من التلات طبقات الجنينية. Connective وmuscle من mesoderm، وnervous من ectoderm."}, {"q": "List the general characteristics of epithelial tissue (Table 4.1).", "a": "Cellular, polar, attached, avascular, innervated, high regeneration capacity.", "w": "خلوي، قطبى (له قمة وقاعدة)، ملتصق، بلا أوعية دموية، مُعصَّب، وقدرته على التجدد عالية."}, {"q": "Hypertrophy vs hyperplasia?", "a": "Hypertrophy = increase in the size of existing cells; hyperplasia = increase in the number of cells.", "w": "trophy = حجم، plasia = عدد."}, {"q": "Neoplasia vs atrophy?", "a": "Neoplasia = out-of-control growth that forms a tumor; atrophy = shrinkage of tissue by cell size or number.", "w": "neo = نمو جديد خارج السيطرة (ورم)، a-trophy = ضمور."}, {"q": "Eukaryote vs prokaryote: what is the defining difference?", "a": "Eukaryote = cell with a nucleus; prokaryote = cell without a nucleus.", "w": "eu = نواة حقيقية موجودة، pro = بدائية من غير نواة."}, {"q": "Ribosome size in prokaryotic vs eukaryotic cells?", "a": "Prokaryotic: small, 70S. Eukaryotic: large, 80S.", "w": "٧٠ صغيرة، ٨٠ كبيرة."}, {"q": "How does cell division differ between prokaryotes and eukaryotes?", "a": "Prokaryotes divide by binary fission; eukaryotes divide by mitosis or meiosis.", "w": "انشطار ثنائي ضد انقسام ميتوزي أو ميوزي."}, {"q": "How does DNA differ between prokaryotes and eukaryotes?", "a": "Prokaryotic DNA is circular without proteins; eukaryotic DNA is linear and associated with proteins to form chromatin.", "w": "دائري من غير بروتين ضد خطي مرتبط ببروتين بيكوّن كروماتين."}, {"q": "What are the approximate cell sizes of prokaryotes and eukaryotes (with the corrected unit)?", "a": "Prokaryotic < 5 µm, eukaryotic > 10 µm (the slide wrongly says nm; the correct unit is micrometers).", "w": "السلايد كاتب nm والصح µm، احفظ الأرقام بالميكرومتر."}]}};
+const GLOS = {"tomography": ["تصوير مقطعي", "Imaging by slices or cross-sections."], "cross-section": ["مقطع عرضي", "A slice view through a structure."], "transverse": ["مستعرض", "Across the long axis of the body."], "axial": ["محوري", "Along or around an axis."], "computed tomography": ["التصوير المقطعي المحوسب", "CT: computer-made cross-sectional x-ray images."], "x-ray": ["أشعة سينية", "Ionizing radiation used for imaging."], "projection": ["إسقاط", "Transmission measurement from one direction."], "reconstruction": ["إعادة بناء", "Mathematical rebuilding of the image from projections."], "superimposition": ["تراكب", "Structures overlapping on the image."], "radiography": ["التصوير الإشعاعي", "Plain x-ray imaging."], "homogenous": ["متجانس", "Of the same composition throughout."], "thickness": ["سماكة", "How thick an object is."], "sensitivity": ["حساسية", "Ability to show small differences."], "contrast": ["تباين", "Difference in density or brightness between tissues."], "tomographic": ["مقطعي", "Related to tomography."], "fulcrum": ["نقطة ارتكاز", "Pivot point of the tomographic motion."], "pivot": ["محور ارتكاز", "The fixed turning point."], "objective plane": ["المستوى الهدفي", "The plane kept sharp in conventional tomography."], "image receptor": ["مستقبل الصورة", "The film or detector receiving the image."], "blurring": ["تطميس", "Spreading of image detail outside the focal plane."], "trajectory": ["مسار", "Path of tube movement."], "linear": ["خطي", "Straight-line movement."], "elliptical": ["إهليجي", "Oval path."], "circular": ["دائري", "Ring-shaped."], "spiral": ["حلزوني", "Spiral path."], "hypocycloidal": ["تحت دائري", "A complex curved tube path."], "gantry": ["الحامل / الجانتري", "The frame holding tube and detectors."], "detector": ["كاشف", "Device measuring the x-rays after the body."], "detector array": ["مجموعة الكواشف", "Row of detectors."], "data acquisition system": ["نظام تجميع البيانات", "DAS: collects and digitizes detector signals."], "filtration": ["فلترة", "Removing weak x-rays from the beam."], "fan beam": ["حزمة مروحية", "Fan-shaped x-ray beam."], "scanner": ["جهاز المسح", "The CT machine."], "modality": ["تقنية تصوير", "An imaging method."], "digital": ["رقمي", "Computer-processed."], "mri": ["رنين مغناطيسي", "Magnetic resonance imaging."], "soft tissue": ["نسيج رخو", "Non-bony tissue."], "contrast media": ["مادة تباين", "Dye given to improve image contrast."], "nobel prize": ["جائزة نوبل", "Awarded 1979 to Hounsfield and Cormack."], "engineer": ["مهندس", ""], "physicist": ["فيزيائي", ""], "cell": ["خلية", "Basic unit of the body."], "trillion": ["تريليون", "A million million."], "tissue": ["نسيج", "Group of similar cells with a common function."], "histology": ["علم الأنسجة", "The study of tissues."], "epithelial": ["ظهاري", "Tissue covering and lining surfaces."], "epithelium": ["ظهارة", "The epithelial tissue layer."], "connective tissue": ["نسيج ضام", "Supporting and connecting tissue."], "muscle tissue": ["نسيج عضلي", "Tissue for movement."], "nervous tissue": ["نسيج عصبي", "Tissue of brain, cord and nerves."], "cavity": ["تجويف", "A hollow space in the body."], "duct": ["قناة", "A tube carrying secretions."], "blood vessel": ["وعاء دموي", "Artery, vein or capillary."], "protection": ["حماية", ""], "microbial": ["ميكروبي", "Related to microbes."], "invasion": ["غزو", "Entry and spread of microbes."], "receptor": ["مستقبل", "Structure responding to stimuli."], "stimulus": ["مؤثر", "Something that triggers a response."], "secrete": ["يفرز", "To produce and release a substance."], "reabsorb": ["يعيد امتصاص", "To take back in."], "serous fluid": ["سائل مصلي", "Watery lubricating fluid."], "lubricate": ["يزلّق", "To reduce friction."], "simple": ["بسيط", "One cell layer."], "stratified": ["مطبق", "Many cell layers."], "layer": ["طبقة", ""], "abundant": ["وفير", "Present in large amounts."], "tendon": ["وتر", "Connects muscle to bone."], "ligament": ["رباط", "Connects bone to bone."], "cushion": ["يدعم ويحمي", "To protect from impact."], "insulate": ["يعزل", "To reduce heat loss."], "fat": ["دهون", "Adipose tissue."], "transport": ["نقل", "Moving substances around the body."], "areolar": ["هالي", "Loose connective tissue type."], "adipose": ["دهني", "Fat-storing loose connective tissue."], "reticular": ["شبكي", "Net-like loose connective tissue."], "dense": ["كثيف", "Tightly packed connective tissue."], "regular": ["منتظم", "Parallel-fiber dense tissue."], "irregular": ["غير منتظم", "Random-fiber dense tissue."], "elastic": ["مرن", "Stretchable tissue."], "cartilage": ["غضروف", "Firm supporting tissue."], "hyaline": ["زجاجي", "Glassy cartilage type."], "fibrocartilage": ["غضروف ليفي", "Tough cartilage type."], "bone": ["عظم", "Hard supporting tissue."], "compact bone": ["عظم متراص", "Dense bone."], "spongy bone": ["عظم إسفنجي", "Porous bone."], "blood": ["دم", "Fluid connective tissue."], "skeletal muscle": ["عضلة هيكلية", "Voluntary striated muscle of the skeleton."], "cardiac muscle": ["عضلة قلبية", "Heart muscle."], "smooth muscle": ["عضلة ملساء", "Involuntary nonstriated muscle."], "movement": ["حركة", ""], "locomotion": ["تنقل", "Moving from place to place."], "posture": ["وضعية الجسم", "Body position."], "facial expression": ["تعبير وجه", ""], "striated": ["مخطط", "Banded appearance."], "bifurcated": ["متفرع", "Split into branches."], "intercalated discs": ["أقراص مقحمة", "Junctions between cardiac cells."], "nucleus": ["نواة", "Cell control centre."], "nuclei": ["أنوية", "Plural of nucleus."], "myocardium": ["عضلة القلب / الميوكارديوم", "Heart wall muscle."], "fusiform": ["مغزلي", "Spindle-shaped."], "nonstriated": ["غير مخطط", "Without bands."], "hollow organ": ["عضو مجوف", "Organ with a cavity inside."], "bladder": ["مثانة", ""], "uterus": ["رحم", ""], "involuntary": ["لا إرادي", "Not under conscious control."], "voluntary": ["إرادي", "Under conscious control."], "neuron": ["عصبون", "Nerve cell conducting electrical activity."], "neuroglia": ["خلايا دبقية", "Support cells of nervous tissue."], "brain": ["مخ", ""], "spinal cord": ["حبل شوكي", ""], "nerve": ["عصب", ""], "nerve impulse": ["نبضة عصبية", "Electrical signal in nerves."], "dendrite": ["تفرع شجيري", "Neuron branch receiving signals."], "axon": ["محور عصبي", "Long fibre carrying impulses away."], "hypertrophy": ["تضخم", "Increase in cell size."], "hyperplasia": ["تزايد خلوي", "Increase in cell number."], "neoplasia": ["ورم / نمو ورمي", "Out-of-control growth forming a tumor."], "atrophy": ["ضمور", "Shrinkage of tissue."], "tumor": ["ورم", "Abnormal growth."], "aging": ["شيخوخة", ""], "eukaryotic": ["حقيقي النواة", "Cell with a nucleus."], "prokaryotic": ["أولي النواة", "Cell without a nucleus."], "unicellular": ["وحيد الخلية", "Made of one cell."], "multicellular": ["متعدد الخلايا", "Made of many cells."], "organelle": ["عضية", "A small structure inside the cell."], "membrane-bound": ["محاط بغشاء", "Surrounded by a membrane."], "dna": ["حمض نووي DNA", "Genetic material."], "rna": ["حمض نووي RNA", ""], "linear dna": ["DNA خطي", "Straight-strand DNA."], "chromatin": ["كروماتين", "DNA with proteins."], "ribosome": ["ريبوسوم", "Protein-making particle."], "cytoskeleton": ["هيكل خلوي", "Internal cell scaffold."], "binary fission": ["انشطار ثنائي", "Simple cell splitting."], "mitosis": ["انقسام ميتوزي", "Equal cell division."], "meiosis": ["انقسام ميوزي", "Sex-cell division."], "asexual": ["لا جنسي", "Without sexual reproduction."], "sexual": ["جنسي", "With sexual reproduction."], "capsule": ["محفظة", "Outer layer of a prokaryotic cell."], "cell wall": ["جدار خلوي", "Rigid layer outside the membrane."], "nucleoid": ["منطقة النواة", "DNA region in prokaryotes."], "cytoplasm": ["سيتوبلازم", "Fluid inside the cell."], "mitochondrion": ["ميتوكوندريا", "Energy organelle."], "golgi complex": ["جهاز جولجي", "Packaging organelle."], "endoplasmic reticulum": ["شبكة إندوبلازمية", "Membrane network in the cell."], "flagellum": ["سوط", "Tail for cell movement."], "peptidoglycan": ["ببتيدوجلايكان", "Cell wall material of bacteria."], "epidemiology": ["وبائيات", "Study of disease distribution."], "deterministic effect": ["تأثير حتمي", "Dose-threshold radiation effect."], "stochastic effect": ["تأثير احتمالي", "Chance-based radiation effect."], "irradiation": ["تشعيع", "Exposure to radiation."], "radiobiology": ["علم الأحياء الإشعاعي", "Biology of radiation effects."], "ionizing radiation": ["إشعاع مؤين", "Radiation that removes electrons."]};
+const SVGS = {"svg_timeline": "<svg viewBox=\"0 0 560 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\">\n<defs><linearGradient id=\"tlg\" x1=\"0\" x2=\"1\"><stop offset=\"0\" stop-color=\"#2563eb\"/><stop offset=\"1\" stop-color=\"#7c3aed\"/></linearGradient></defs>\n<line x1=\"30\" y1=\"120\" x2=\"530\" y2=\"120\" stroke=\"url(#tlg)\" stroke-width=\"4\" stroke-linecap=\"round\"/>\n<g font-size=\"12\" fill=\"#1e1b4b\">\n<circle cx=\"70\" cy=\"120\" r=\"8\" fill=\"#2563eb\"/><text x=\"70\" y=\"100\" text-anchor=\"middle\" font-weight=\"800\">1963</text><text x=\"70\" y=\"145\" text-anchor=\"middle\">Cormack:</text><text x=\"70\" y=\"160\" text-anchor=\"middle\">reconstruction</text><text x=\"70\" y=\"174\" text-anchor=\"middle\">mathematics</text>\n<circle cx=\"220\" cy=\"120\" r=\"8\" fill=\"#4f46e5\"/><text x=\"220\" y=\"100\" text-anchor=\"middle\" font-weight=\"800\">1971</text><text x=\"220\" y=\"145\" text-anchor=\"middle\">Hounsfield (EMI):</text><text x=\"220\" y=\"160\" text-anchor=\"middle\">first clinical scanner,</text><text x=\"220\" y=\"174\" text-anchor=\"middle\">Atkinson-Morley</text>\n<circle cx=\"360\" cy=\"120\" r=\"8\" fill=\"#6d28d9\"/><text x=\"360\" y=\"100\" text-anchor=\"middle\" font-weight=\"800\">1972</text><text x=\"360\" y=\"145\" text-anchor=\"middle\">first scanner</text><text x=\"360\" y=\"160\" text-anchor=\"middle\">demonstrated using</text><text x=\"360\" y=\"174\" text-anchor=\"middle\">Cormack's maths</text>\n<circle cx=\"490\" cy=\"120\" r=\"8\" fill=\"#7c3aed\"/><text x=\"490\" y=\"100\" text-anchor=\"middle\" font-weight=\"800\">1979</text><text x=\"490\" y=\"145\" text-anchor=\"middle\">Nobel Prize in</text><text x=\"490\" y=\"160\" text-anchor=\"middle\">medicine, shared</text>\n</g></svg>", "svg_superimposition": "<svg viewBox=\"0 0 560 220\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\">\n<defs><marker id=\"ar\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 z\" fill=\"#7c3aed\"/></marker></defs>\n<text x=\"90\" y=\"22\" font-size=\"13\" font-weight=\"800\" fill=\"#1e1b4b\">3D body (different depths)</text>\n<rect x=\"60\" y=\"40\" width=\"14\" height=\"140\" rx=\"4\" fill=\"#fde68a\"/><text x=\"30\" y=\"115\" font-size=\"11\" fill=\"#92400e\" transform=\"rotate(-90 30 115)\"></text>\n<text x=\"60\" y=\"34\" font-size=\"11\" fill=\"#92400e\">x-ray beam</text>\n<g>\n<circle cx=\"130\" cy=\"80\" r=\"26\" fill=\"#93c5fd\" opacity=\".9\"/><text x=\"130\" y=\"84\" font-size=\"10\" text-anchor=\"middle\" fill=\"#1e3a8a\">bone</text>\n<rect x=\"170\" y=\"95\" width=\"52\" height=\"40\" rx=\"8\" fill=\"#f9a8d4\" opacity=\".85\"/><text x=\"196\" y=\"118\" font-size=\"10\" text-anchor=\"middle\" fill=\"#831843\">organ</text>\n<circle cx=\"150\" cy=\"150\" r=\"18\" fill=\"#bbf7d0\" opacity=\".9\"/><text x=\"150\" y=\"154\" font-size=\"10\" text-anchor=\"middle\" fill=\"#14532d\">air</text>\n</g>\n<line x1=\"250\" y1=\"110\" x2=\"310\" y2=\"110\" stroke=\"#7c3aed\" stroke-width=\"3\" marker-end=\"url(#ar)\"/>\n<text x=\"430\" y=\"52\" font-size=\"13\" font-weight=\"800\" fill=\"#1e1b4b\">2D image: all stacked on one level</text>\n<rect x=\"330\" y=\"70\" width=\"200\" height=\"90\" rx=\"10\" fill=\"#eef2ff\" stroke=\"#c7d2fe\"/>\n<circle cx=\"395\" cy=\"105\" r=\"24\" fill=\"#60a5fa\" opacity=\".8\"/>\n<rect x=\"410\" y=\"105\" width=\"48\" height=\"34\" rx=\"8\" fill=\"#ec4899\" opacity=\".7\"/>\n<circle cx=\"410\" cy=\"140\" r=\"16\" fill=\"#34d399\" opacity=\".8\"/>\n<text x=\"430\" y=\"190\" font-size=\"11\" fill=\"#6b7280\">They merge into one shadow - this is superimposition.</text>\n</svg>", "svg_blur": "<svg viewBox=\"0 0 560 260\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\">\n<defs><marker id=\"ar2\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 z\" fill=\"#2563eb\"/></marker></defs>\n<rect x=\"70\" y=\"20\" width=\"46\" height=\"26\" rx=\"5\" fill=\"#475569\"/><text x=\"93\" y=\"60\" font-size=\"11\" text-anchor=\"middle\" fill=\"#1e1b4b\">tube position 1</text>\n<rect x=\"444\" y=\"20\" width=\"46\" height=\"26\" rx=\"5\" fill=\"#475569\"/><text x=\"467\" y=\"60\" font-size=\"11\" text-anchor=\"middle\" fill=\"#1e1b4b\">tube position 2</text>\n<line x1=\"116\" y1=\"33\" x2=\"444\" y2=\"33\" stroke=\"#94a3b8\" stroke-dasharray=\"5 4\" stroke-width=\"2\"/>\n<g font-size=\"12\" font-weight=\"700\" fill=\"#1e1b4b\">\n<circle cx=\"250\" cy=\"90\" r=\"6\" fill=\"#dc2626\"/><text x=\"264\" y=\"94\">A (above plane)</text>\n<circle cx=\"280\" cy=\"140\" r=\"6\" fill=\"#2563eb\"/><text x=\"296\" y=\"144\">B = fulcrum (objective plane)</text>\n<circle cx=\"310\" cy=\"190\" r=\"6\" fill=\"#16a34a\"/><text x=\"326\" y=\"194\">C (below plane)</text>\n</g>\n<g stroke=\"#f59e0b\" stroke-width=\"2\" opacity=\".85\">\n<line x1=\"93\" y1=\"46\" x2=\"250\" y2=\"90\" stroke-dasharray=\"4 3\"/><line x1=\"93\" y1=\"46\" x2=\"280\" y2=\"140\" stroke-dasharray=\"4 3\"/><line x1=\"93\" y1=\"46\" x2=\"310\" y2=\"190\" stroke-dasharray=\"4 3\"/>\n<line x1=\"467\" y1=\"46\" x2=\"250\" y2=\"90\" stroke-dasharray=\"4 3\"/><line x1=\"467\" y1=\"46\" x2=\"280\" y2=\"140\" stroke-dasharray=\"4 3\"/><line x1=\"467\" y1=\"46\" x2=\"310\" y2=\"190\" stroke-dasharray=\"4 3\"/>\n</g>\n<line x1=\"80\" y1=\"225\" x2=\"480\" y2=\"225\" stroke=\"#1e1b4b\" stroke-width=\"5\"/>\n<text x=\"90\" y=\"245\" font-size=\"11\" fill=\"#1e1b4b\">image receptor</text>\n<line x1=\"250\" y1=\"90\" x2=\"160\" y2=\"225\" stroke=\"#dc2626\" stroke-width=\"1.6\" stroke-dasharray=\"3 3\"/>\n<line x1=\"250\" y1=\"90\" x2=\"400\" y2=\"225\" stroke=\"#dc2626\" stroke-width=\"1.6\" stroke-dasharray=\"3 3\"/>\n<line x1=\"280\" y1=\"140\" x2=\"280\" y2=\"225\" stroke=\"#2563eb\" stroke-width=\"2.4\"/>\n<line x1=\"310\" y1=\"190\" x2=\"200\" y2=\"225\" stroke=\"#16a34a\" stroke-width=\"1.6\" stroke-dasharray=\"3 3\"/>\n<line x1=\"310\" y1=\"190\" x2=\"360\" y2=\"225\" stroke=\"#16a34a\" stroke-width=\"1.6\" stroke-dasharray=\"3 3\"/>\n<text x=\"160\" y=\"245\" font-size=\"11\" fill=\"#dc2626\">A moves - blurred</text>\n<text x=\"270\" y=\"245\" font-size=\"11\" fill=\"#2563eb\">B stays put - sharp</text>\n<text x=\"380\" y=\"245\" font-size=\"11\" fill=\"#16a34a\">C moves - blurred</text>\n</svg>", "svg_trajectories": "<svg viewBox=\"0 0 560 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\">\n<g font-size=\"12\" fill=\"#1e1b4b\" font-weight=\"700\">\n<g transform=\"translate(10,20)\"><line x1=\"10\" y1=\"60\" x2=\"90\" y2=\"60\" stroke=\"#2563eb\" stroke-width=\"3\"/><path d=\"M14 60 l8 -5 M14 60 l8 5 M86 60 l-8 -5 M86 60 l-8 5\" stroke=\"#2563eb\" stroke-width=\"2.5\" fill=\"none\"/><text x=\"50\" y=\"95\" text-anchor=\"middle\">1 Linear</text></g>\n<g transform=\"translate(120,20)\"><ellipse cx=\"50\" cy=\"60\" rx=\"42\" ry=\"24\" fill=\"none\" stroke=\"#4f46e5\" stroke-width=\"3\"/><text x=\"50\" y=\"105\" text-anchor=\"middle\">2 Elliptical</text></g>\n<g transform=\"translate(230,20)\"><circle cx=\"50\" cy=\"55\" r=\"32\" fill=\"none\" stroke=\"#6d28d9\" stroke-width=\"3\"/><text x=\"50\" y=\"105\" text-anchor=\"middle\">3 Circular</text></g>\n<g transform=\"translate(340,20)\"><path d=\"M50 55 m0 -4 a4 4 0 0 1 0 8 a9 9 0 0 1 0 -18 a15 15 0 0 1 0 30 a22 22 0 0 1 0 -44\" fill=\"none\" stroke=\"#7c3aed\" stroke-width=\"3\"/><text x=\"50\" y=\"105\" text-anchor=\"middle\">4 Spiral</text></g>\n<g transform=\"translate(450,20)\"><path d=\"M50 20 C 78 32 78 78 50 90 C 22 78 22 32 50 20 M50 20 C 40 55 40 55 50 90 M50 20 C 60 55 60 55 50 90\" fill=\"none\" stroke=\"#9333ea\" stroke-width=\"2.4\"/><text x=\"50\" y=\"105\" text-anchor=\"middle\">5 Hypocycloidal</text></g>\n</g>\n<text x=\"280\" y=\"160\" font-size=\"12\" fill=\"#6b7280\" text-anchor=\"middle\">The 5 basic tube trajectories in conventional tomography</text>\n</svg>", "svg_connective": "<svg viewBox=\"0 0 560 320\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\" font-size=\"11\">\n<defs><style>.bx{fill:#eef2ff;stroke:#7c6ae0;rx:8}.hd{fill:#7c3aed}.tx{fill:#1e1b4b}.wt{fill:#fff}</style></defs>\n<rect x=\"190\" y=\"8\" width=\"180\" height=\"30\" rx=\"10\" class=\"hd\"/><text x=\"280\" y=\"27\" text-anchor=\"middle\" class=\"wt\" font-weight=\"800\" font-size=\"13\">Connective tissue</text>\n<line x1=\"280\" y1=\"38\" x2=\"280\" y2=\"52\" stroke=\"#7c6ae0\" stroke-width=\"2\"/>\n<line x1=\"110\" y1=\"52\" x2=\"450\" y2=\"52\" stroke=\"#7c6ae0\" stroke-width=\"2\"/>\n<line x1=\"110\" y1=\"52\" x2=\"110\" y2=\"64\" stroke=\"#7c6ae0\" stroke-width=\"2\"/><line x1=\"280\" y1=\"52\" x2=\"280\" y2=\"64\" stroke=\"#7c6ae0\" stroke-width=\"2\"/><line x1=\"450\" y1=\"52\" x2=\"450\" y2=\"64\" stroke=\"#7c6ae0\" stroke-width=\"2\"/>\n<rect x=\"30\" y=\"64\" width=\"160\" height=\"26\" rx=\"8\" fill=\"#4f46e5\"/><text x=\"110\" y=\"81\" text-anchor=\"middle\" class=\"wt\" font-weight=\"700\">Connective tissue proper</text>\n<rect x=\"200\" y=\"64\" width=\"160\" height=\"26\" rx=\"8\" fill=\"#4f46e5\"/><text x=\"280\" y=\"81\" text-anchor=\"middle\" class=\"wt\" font-weight=\"700\">Supporting</text>\n<rect x=\"380\" y=\"64\" width=\"140\" height=\"26\" rx=\"8\" fill=\"#4f46e5\"/><text x=\"450\" y=\"81\" text-anchor=\"middle\" class=\"wt\" font-weight=\"700\">Fluid</text>\n<rect x=\"30\" y=\"104\" width=\"75\" height=\"24\" rx=\"7\" class=\"bx\"/><text x=\"67\" y=\"120\" text-anchor=\"middle\" class=\"tx\">Loose</text>\n<rect x=\"115\" y=\"104\" width=\"75\" height=\"24\" rx=\"7\" class=\"bx\"/><text x=\"152\" y=\"120\" text-anchor=\"middle\" class=\"tx\">Dense</text>\n<rect x=\"200\" y=\"104\" width=\"76\" height=\"24\" rx=\"7\" class=\"bx\"/><text x=\"238\" y=\"120\" text-anchor=\"middle\" class=\"tx\">Cartilage</text>\n<rect x=\"284\" y=\"104\" width=\"76\" height=\"24\" rx=\"7\" class=\"bx\"/><text x=\"322\" y=\"120\" text-anchor=\"middle\" class=\"tx\">Bone</text>\n<rect x=\"380\" y=\"104\" width=\"140\" height=\"24\" rx=\"7\" class=\"bx\"/><text x=\"450\" y=\"120\" text-anchor=\"middle\" class=\"tx\">Blood</text>\n<g class=\"tx\">\n<rect x=\"8\" y=\"144\" width=\"60\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"38\" y=\"159\" text-anchor=\"middle\">Areolar</text>\n<rect x=\"74\" y=\"144\" width=\"60\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"104\" y=\"159\" text-anchor=\"middle\">Adipose</text>\n<rect x=\"140\" y=\"144\" width=\"62\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"171\" y=\"159\" text-anchor=\"middle\">Reticular</text>\n<rect x=\"8\" y=\"176\" width=\"60\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"38\" y=\"191\" text-anchor=\"middle\">Regular</text>\n<rect x=\"74\" y=\"176\" width=\"60\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"104\" y=\"191\" text-anchor=\"middle\">Irregular</text>\n<rect x=\"140\" y=\"176\" width=\"62\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"171\" y=\"191\" text-anchor=\"middle\">Elastic</text>\n<rect x=\"212\" y=\"144\" width=\"56\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"240\" y=\"159\" text-anchor=\"middle\">Hyaline</text>\n<rect x=\"212\" y=\"176\" width=\"72\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"248\" y=\"191\" text-anchor=\"middle\">Fibrocartilage</text>\n<rect x=\"212\" y=\"208\" width=\"56\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"240\" y=\"223\" text-anchor=\"middle\">Elastic</text>\n<rect x=\"300\" y=\"144\" width=\"60\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"330\" y=\"159\" text-anchor=\"middle\">Compact</text>\n<rect x=\"300\" y=\"176\" width=\"60\" height=\"22\" rx=\"6\" class=\"bx\"/><text x=\"330\" y=\"191\" text-anchor=\"middle\">Spongy</text>\n</g>\n<line x1=\"67\" y1=\"128\" x2=\"38\" y2=\"144\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/><line x1=\"67\" y1=\"128\" x2=\"104\" y2=\"144\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/><line x1=\"67\" y1=\"128\" x2=\"171\" y2=\"144\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/>\n<line x1=\"152\" y1=\"128\" x2=\"38\" y2=\"176\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/><line x1=\"152\" y1=\"128\" x2=\"104\" y2=\"176\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/><line x1=\"152\" y1=\"128\" x2=\"171\" y2=\"176\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/>\n<line x1=\"238\" y1=\"128\" x2=\"240\" y2=\"144\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/><line x1=\"238\" y1=\"128\" x2=\"248\" y2=\"176\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/><line x1=\"238\" y1=\"128\" x2=\"240\" y2=\"208\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/>\n<line x1=\"322\" y1=\"128\" x2=\"330\" y2=\"144\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/><line x1=\"322\" y1=\"128\" x2=\"330\" y2=\"176\" stroke=\"#c7d2fe\" stroke-width=\"1.5\"/>\n<text x=\"280\" y=\"300\" text-anchor=\"middle\" fill=\"#6b7280\" font-size=\"11\">Original redraw of the slide's classification chart (Figure 4.8)</text>\n</svg>", "svg_mrict": "<svg viewBox=\"0 0 560 240\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\">\n<g>\n<circle cx=\"140\" cy=\"115\" r=\"80\" fill=\"#1e293b\"/>\n<ellipse cx=\"140\" cy=\"115\" rx=\"66\" ry=\"72\" fill=\"#64748b\"/>\n<path d=\"M110 70 q30 -18 60 0 q22 14 12 40 q26 6 16 34 q-6 22 -34 20 q10 22 -24 22 q-30 0 -24 -26 q-26 -2 -20 -30 q4 -22 24 -24 q-8 -22 10 -36z\" fill=\"#94a3b8\"/>\n<circle cx=\"120\" cy=\"100\" r=\"9\" fill=\"#e2e8f0\"/><circle cx=\"163\" cy=\"132\" r=\"7\" fill=\"#e2e8f0\"/><circle cx=\"138\" cy=\"150\" r=\"5\" fill=\"#cbd5e1\"/>\n<text x=\"140\" y=\"222\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"800\" fill=\"#1e1b4b\">MRI</text>\n<text x=\"140\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"#6b7280\">more soft tissue detail, no contrast media</text>\n</g>\n<g>\n<circle cx=\"420\" cy=\"115\" r=\"80\" fill=\"#0f172a\"/>\n<ellipse cx=\"420\" cy=\"115\" rx=\"66\" ry=\"72\" fill=\"#f8fafc\"/>\n<ellipse cx=\"420\" cy=\"115\" rx=\"56\" ry=\"62\" fill=\"#475569\"/>\n<path d=\"M396 76 q24 -14 48 0 q16 12 8 32 q18 6 10 28 q-6 16 -26 14 q6 18 -20 18 q-22 0 -16 -20 q-20 -2 -14 -24 q2 -16 18 -18 q-6 -18 12 -30z\" fill=\"#64748b\"/>\n<text x=\"420\" y=\"222\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"800\" fill=\"#1e1b4b\">CT</text>\n<text x=\"420\" y=\"20\" text-anchor=\"middle\" font-size=\"11\" fill=\"#6b7280\">bone ring bright, less soft tissue detail</text>\n</g>\n<text x=\"280\" y=\"240\" text-anchor=\"middle\" font-size=\"10\" fill=\"#9ca3af\">Stylized illustration (not a real scan)</text>\n</svg>"};
+const SVG_CAPS = {"svg_timeline": "Original timeline redrawn from the history slide.", "svg_superimposition": "Original diagram of superimposition: structures at different depths merge into one shadow.", "svg_blur": "Original diagram of the tomographic blurring principle (fulcrum).", "svg_trajectories": "Original redraw of the 5 tube trajectories.", "svg_connective": "Original redraw of the connective tissue classification chart.", "svg_mrict": "Stylized original illustration of the MRI vs CT appearance point - not a real scan."};
+const FIG_META = {"euk3d": "Original simplified 3D model - organelles are placeholders, not to scale. Drag to rotate, pinch to zoom.", "prok3d": "Original simplified 3D model - shapes are approximate. Drag to rotate, pinch to zoom.", "neuron3d": "Original simplified 3D model - proportions stylized. Drag to rotate, pinch to zoom.", "skel3d": "Original simplified 3D model - a few fibres stand in for a whole muscle. Drag to rotate, pinch to zoom.", "card3d": "Original simplified 3D model - a short chain of cells stands in for the heart wall. Drag to rotate, pinch to zoom.", "smooth3d": "Original simplified 3D model - a single cell. Drag to rotate, pinch to zoom.", "gantry3d": "Original simplified 3D model of the CT gantry - geometry stylized, labels match the slide. Drag to rotate, pinch to zoom.", "brain3d": "Very stylized 3D illustration of slice planes through a brain - not an anatomical brain model. Drag to rotate, pinch to zoom.", "epi3d": "Original simplified 3D model - flat cells on a membrane. Drag to rotate, pinch to zoom."};
+
+const SCENES = {
+euk3d: {title:"Eukaryotic cell (simplified)", build(g,T,label){
+  const mem=new T.Mesh(new T.SphereGeometry(3,28,20),new T.MeshPhongMaterial({color:0x7dd3fc,transparent:true,opacity:0.22,side:T.DoubleSide}));
+  g.add(mem);
+  const nuc=new T.Mesh(new T.SphereGeometry(1.15,22,16),new T.MeshPhongMaterial({color:0x7c3aed,transparent:true,opacity:0.9}));
+  nuc.position.set(0.5,0.2,0); g.add(nuc);
+  const nus=new T.Mesh(new T.SphereGeometry(0.4,14,10),new T.MeshPhongMaterial({color:0x4c1d95}));
+  nus.position.set(0.5,0.2,0); g.add(nus);
+  for(let i=0;i<5;i++){const a=i*1.25+0.4;
+    const m=new T.Group();
+    const cy=new T.Mesh(new T.CylinderGeometry(0.22,0.22,0.7,10),new T.MeshPhongMaterial({color:0xf59e0b}));
+    const s1=new T.Mesh(new T.SphereGeometry(0.22,10,8),new T.MeshPhongMaterial({color:0xf59e0b}));
+    const s2=s1.clone(); s1.position.y=0.35; s2.position.y=-0.35; m.add(cy,s1,s2);
+    m.position.set(1.9*Math.cos(a),1.1*Math.sin(a*1.7),1.9*Math.sin(a)); m.rotation.set(a,0,a*0.7); g.add(m);}
+  for(let i=0;i<4;i++){const gg=new T.Mesh(new T.SphereGeometry(0.45,10,8),new T.MeshPhongMaterial({color:0xec4899}));
+    gg.scale.set(1.4,0.28,0.8); gg.position.set(-1.3,-0.9+i*0.28,1.1); g.add(gg);}
+  for(let i=0;i<16;i++){const r=new T.Mesh(new T.SphereGeometry(0.09,6,5),new T.MeshPhongMaterial({color:0x1e40af}));
+    const a=i*2.4,b=i*1.1; r.position.set(2.4*Math.cos(a)*Math.sin(b),2.4*Math.sin(a)*Math.sin(b),2.4*Math.cos(b)); g.add(r);}
+  label("Cell membrane",0,3.2,0); label("Nucleus",1.9,0.9,0); label("Nucleolus",0.5,-0.7,0.9);
+  label("Mitochondrion",2.6,-1.4,0.8); label("Golgi complex",-2.4,-0.4,1.4); label("Ribosomes",-1.8,2.2,-1);
+}},
+prok3d: {title:"Prokaryotic cell (simplified)", build(g,T,label){
+  const cap=new T.Mesh(new T.SphereGeometry(3,26,18),new T.MeshPhongMaterial({color:0xa5b4fc,transparent:true,opacity:0.18,side:T.DoubleSide}));
+  cap.scale.set(1.25,0.85,0.85); g.add(cap);
+  const wall=new T.Mesh(new T.SphereGeometry(2.7,26,18),new T.MeshPhongMaterial({color:0x818cf8,transparent:true,opacity:0.3,side:T.DoubleSide}));
+  wall.scale.set(1.25,0.85,0.85); g.add(wall);
+  const dna=new T.Mesh(new T.TorusKnotGeometry(0.75,0.22,60,8),new T.MeshPhongMaterial({color:0x2563eb}));
+  g.add(dna);
+  for(let i=0;i<14;i++){const r=new T.Mesh(new T.SphereGeometry(0.1,6,5),new T.MeshPhongMaterial({color:0x0ea5e9}));
+    const a=i*2.1,b=i*0.9+0.4; r.position.set(2.0*Math.cos(a)*Math.sin(b),1.3*Math.sin(a)*Math.sin(b),1.3*Math.cos(b)); g.add(r);}
+  const curve=new T.CatmullRomCurve3([new T.Vector3(2.9,0,0),new T.Vector3(3.8,0.9,0.3),new T.Vector3(4.6,0.2,-0.5),new T.Vector3(5.3,0.9,0)]);
+  const fl=new T.Mesh(new T.TubeGeometry(curve,24,0.09,6),new T.MeshPhongMaterial({color:0x7c3aed}));
+  g.add(fl);
+  label("Capsule",0,2.7,0); label("Cell wall",-2.2,1.6,0); label("Nucleoid (DNA)",0,-1.5,0);
+  label("Ribosomes",-2.4,-1.2,0.8); label("Flagellum",4.2,1.6,0);
+}},
+neuron3d: {title:"Neuron (simplified)", build(g,T,label){
+  const soma=new T.Mesh(new T.SphereGeometry(1.1,20,16),new T.MeshPhongMaterial({color:0x8b5cf6}));
+  g.add(soma);
+  const nuc=new T.Mesh(new T.SphereGeometry(0.42,12,10),new T.MeshPhongMaterial({color:0x4c1d95}));
+  g.add(nuc);
+  for(let i=0;i<6;i++){const a=i*1.05+0.3;
+    const d=new T.Mesh(new T.CylinderGeometry(0.03,0.14,1.7,6),new T.MeshPhongMaterial({color:0xa78bfa}));
+    d.position.set(0.9*Math.cos(a),0.75+0.25*Math.sin(i*2),0.9*Math.sin(a));
+    d.rotation.set(Math.sin(a)*1.0,-0.5,Math.cos(a)*1.0+1.4); g.add(d);
+    const tip=new T.Mesh(new T.CylinderGeometry(0.02,0.05,0.9,5),new T.MeshPhongMaterial({color:0xc4b5fd}));
+    tip.position.set(1.6*Math.cos(a),1.35+0.25*Math.sin(i*2),1.6*Math.sin(a));
+    tip.rotation.set(Math.sin(a)*1.2,-0.5,Math.cos(a)*1.2+1.4); g.add(tip);}
+  const ax=new T.Mesh(new T.CylinderGeometry(0.16,0.2,4.6,8),new T.MeshPhongMaterial({color:0x8b5cf6}));
+  ax.position.set(0,-3.1,0); g.add(ax);
+  for(let i=0;i<4;i++){const my=new T.Mesh(new T.CylinderGeometry(0.3,0.3,0.75,10),new T.MeshPhongMaterial({color:0x34d399}));
+    my.position.set(0,-1.6-i*1.05,0); g.add(my);}
+  for(let i=0;i<3;i++){const t=new T.Mesh(new T.CylinderGeometry(0.02,0.09,1.0,5),new T.MeshPhongMaterial({color:0xc4b5fd}));
+    t.position.set(0.4*Math.cos(i*2.1),-5.6,0.4*Math.sin(i*2.1)); t.rotation.set(0.5*Math.sin(i*2.1),0,0.5*Math.cos(i*2.1)+0.4); g.add(t);}
+  label("Dendrites",2.4,1.6,0); label("Cell body",1.6,0.1,1.2); label("Nucleus",-1.5,-0.3,0.8);
+  label("Axon",0.9,-3.1,0.6); label("Myelin sheath",-1.3,-2.4,0.4); label("Axon terminals",1.5,-5.7,0);
+}},
+skel3d: {title:"Skeletal muscle (simplified)", build(g,T,label){
+  for(let f=0;f<4;f++){const fx=(f-1.5)*0.85;
+    for(let s=0;s<8;s++){const col=s%2?0xef4444:0x991b1b;
+      const seg=new T.Mesh(new T.CylinderGeometry(0.32,0.32,0.62,10),new T.MeshPhongMaterial({color:col}));
+      seg.position.set(fx,-2.17+s*0.62,f%2?0.4:-0.2); g.add(seg);}}
+  for(let i=0;i<4;i++){const n=new T.Mesh(new T.SphereGeometry(0.12,8,6),new T.MeshPhongMaterial({color:0x1e1b4b}));
+    n.position.set((i-1.5)*0.85+0.34,-1.6+i*1.05,0.15); g.add(n);}
+  label("Muscle fibres",0,2.9,0); label("Striations (bands)",2.2,0.6,0); label("Nuclei (edge)",-2.2,-1.3,0);
+}},
+card3d: {title:"Cardiac muscle (simplified)", build(g,T,label){
+  const cells=[[-1.6,0,0,0],[0,0,0,0],[1.6,0,0,0],[1.6,0.9,0.6,0.7]];
+  cells.forEach(function(c){
+    const seg=new T.Mesh(new T.CylinderGeometry(0.34,0.34,1.3,10),new T.MeshPhongMaterial({color:0xf87171}));
+    seg.position.set(c[0],c[1],c[2]); seg.rotation.z=Math.PI/2; seg.rotation.y=c[3]; g.add(seg);
+    const n=new T.Mesh(new T.SphereGeometry(0.16,8,6),new T.MeshPhongMaterial({color:0x1e1b4b}));
+    n.position.set(c[0],c[1],c[2]+0.1); g.add(n);});
+  [-0.8,0.8].forEach(function(x){
+    const d=new T.Mesh(new T.CylinderGeometry(0.4,0.4,0.1,12),new T.MeshPhongMaterial({color:0x7c2d12}));
+    d.position.set(x,0,0); d.rotation.z=Math.PI/2; g.add(d);});
+  label("Branched fibres",0,1.4,0); label("Intercalated discs",-0.8,-1.0,0.9); label("Nucleus (central)",1.8,-0.9,0.7);
+}},
+smooth3d: {title:"Smooth muscle cell (simplified)", build(g,T,label){
+  const pts=[]; for(let i=0;i<=12;i++){const t=i/12; pts.push(new T.Vector2(0.02+0.62*Math.sin(Math.PI*t),-2.2+4.4*t));}
+  const cell=new T.Mesh(new T.LatheGeometry(pts,18),new T.MeshPhongMaterial({color:0xfda4af}));
+  g.add(cell);
+  const npts=[]; for(let i=0;i<=10;i++){const t=i/10; npts.push(new T.Vector2(0.02+0.2*Math.sin(Math.PI*t),-0.7+1.4*t));}
+  const nuc=new T.Mesh(new T.LatheGeometry(npts,12),new T.MeshPhongMaterial({color:0x881337}));
+  g.add(nuc);
+  label("Fusiform (spindle) cell",0,2.6,0); label("Nucleus (one, central)",1.5,0.1,0); label("No striations",-1.7,-1.4,0);
+}},
+gantry3d: {title:"CT gantry (simplified)", build(g,T,label){
+  const gan=new T.Mesh(new T.TorusGeometry(2.6,1.0,16,32),new T.MeshPhongMaterial({color:0xe2e8f0}));
+  g.add(gan);
+  const bore=new T.Mesh(new T.TorusGeometry(2.6,0.55,14,32),new T.MeshPhongMaterial({color:0x94a3b8}));
+  bore.position.z=-0.5; g.add(bore);
+  const table=new T.Mesh(new T.BoxGeometry(1.3,0.28,7),new T.MeshPhongMaterial({color:0x475569}));
+  table.position.set(0,-1.55,0.6); g.add(table);
+  const mat=new T.Mesh(new T.BoxGeometry(1.15,0.12,6.6),new T.MeshPhongMaterial({color:0x93c5fd}));
+  mat.position.set(0,-1.35,0.6); g.add(mat);
+  const src=new T.Mesh(new T.BoxGeometry(0.7,0.5,0.5),new T.MeshPhongMaterial({color:0xdc2626}));
+  src.position.set(0,2.35,0); g.add(src);
+  const beam=new T.Mesh(new T.ConeGeometry(1.25,3.4,4,1,true),new T.MeshBasicMaterial({color:0xfbbf24,transparent:true,opacity:0.42,side:T.DoubleSide}));
+  beam.position.set(0,0.45,0); beam.rotation.z=Math.PI; beam.rotation.y=Math.PI/4; g.add(beam);
+  for(let i=-2;i<=2;i++){const a=i*0.22;
+    const det=new T.Mesh(new T.BoxGeometry(0.5,0.24,0.3),new T.MeshPhongMaterial({color:0x2563eb}));
+    det.position.set(2.3*Math.sin(a),-2.3*Math.cos(a),0); det.rotation.z=-a; g.add(det);}
+  const das=new T.Mesh(new T.BoxGeometry(0.9,0.7,0.7),new T.MeshPhongMaterial({color:0x334155}));
+  das.position.set(3.4,0.6,-0.6); g.add(das);
+  label("Gantry",-2.6,2.4,0); label("X-ray source",1.6,2.7,0); label("Fan beam",1.5,0.6,0.9);
+  label("Detector array",-2.4,-2.5,0); label("Patient table",0,-2.2,2.6); label("DAS",3.5,1.6,-0.6);
+}},
+brain3d: {title:"Brain cut into slices (very stylized)", build(g,T,label){
+  const br=new T.Mesh(new T.SphereGeometry(1.8,24,18),new T.MeshPhongMaterial({color:0xf9a8d4}));
+  br.scale.set(1,0.82,1.12); g.add(br);
+  const groove=new T.Mesh(new T.BoxGeometry(0.06,1.5,4.0),new T.MeshPhongMaterial({color:0xdb2777}));
+  groove.position.y=0.7; g.add(groove);
+  [-0.8,0,0.8].forEach(function(z){
+    const pl=new T.Mesh(new T.PlaneGeometry(3.4,2.9),new T.MeshBasicMaterial({color:0x60a5fa,transparent:true,opacity:0.28,side:T.DoubleSide}));
+    pl.position.z=z; g.add(pl);});
+  [-0.8,0,0.8].forEach(function(z,i){
+    const sl=new T.Mesh(new T.CylinderGeometry(1.45,1.45,0.09,22),new T.MeshPhongMaterial({color:0xf472b6}));
+    sl.position.set(4.6,-1.1+i*1.1,0); sl.rotation.x=Math.PI/2; g.add(sl);});
+  label("Brain",0,1.8,0); label("Slice planes",-2.5,0.4,0); label("Cross-sectional slices",4.6,2.2,0);
+}},
+epi3d: {title:"Simple vs stratified epithelium (simplified)", build(g,T,label){
+  const bm=new T.Mesh(new T.BoxGeometry(6.4,0.22,1.6),new T.MeshPhongMaterial({color:0xf59e0b}));
+  bm.position.y=-0.15; g.add(bm);
+  const ct2=new T.Mesh(new T.BoxGeometry(6.4,0.5,1.6),new T.MeshPhongMaterial({color:0xfde68a}));
+  ct2.position.y=-0.5; g.add(ct2);
+  for(let i=0;i<4;i++){const c=new T.Mesh(new T.SphereGeometry(0.42,12,10),new T.MeshPhongMaterial({color:0x8b5cf6}));
+    c.scale.set(1,0.55,1); c.position.set(-2.4+i*0.85,0.35,0); g.add(c);
+    const n=new T.Mesh(new T.SphereGeometry(0.13,8,6),new T.MeshPhongMaterial({color:0x312e81}));
+    n.position.set(-2.4+i*0.85,0.35,0.1); g.add(n);}
+  for(let l=0;l<3;l++)for(let i=0;i<4;i++){const c=new T.Mesh(new T.SphereGeometry(0.42,12,10),new T.MeshPhongMaterial({color:l==2?0xc4b5fd:0x8b5cf6}));
+    c.scale.set(1,0.55,1); c.position.set(0.9+i*0.85,0.35+l*0.45,0); g.add(c);}
+  label("Simple (1 layer)",-1.2,1.3,0); label("Stratified (many layers)",2.0,2.2,0); label("Basement membrane",0,-1.1,0.9);
+}},
+};
+
+
+const STORE_KEY="jinoStudyV1";
+let S={};
+try{S=JSON.parse(localStorage.getItem(STORE_KEY)||"{}")}catch(e){S={}}
+function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(S))}catch(e){}}
+function st(sid){ if(!S[sid])S[sid]={read:[],flash:{},quizBest:0,quizAtt:0,recall:{}}; return S[sid]; }
+if(!S.lang)S.lang={};
+
+let cur=null, tab="learn", qi=0, qscore=0, qmiss=[], qlock=false;
+let fi=0, flipped=false, deck=null, deckMode="all";
+let ri=0, rshown=false, rdeck=null;
+
+const $=s=>document.querySelector(s);
+const hdr=$("#hdr"), app=$("#app");
+function pct(n,d){return d?Math.round(n/d*100):0}
+
+function subjProgress(sid){
+ const d=DATA[sid], s=st(sid);
+ const parts=[
+  pct(s.read.length, d.sections.length),
+  pct(Object.keys(s.flash).filter(k=>s.flash[k]).length, d.flash.length),
+  s.quizAtt? s.quizBest : 0,
+  pct(Object.keys(s.recall).filter(k=>s.recall[k]).length, d.recall.length),
+ ];
+ return Math.round(parts.reduce((a,b)=>a+b,0)/parts.length);
+}
+function headerHome(){ hdr.innerHTML=`<div class="hrow"><h1>Jino Study</h1><button class="tourbtn" onclick="tourStart()">؟ جولة</button></div><p>Semester 1 - Faculty of Radiography · offline</p>`; }
+function headerSubj(sid){ const d=DATA[sid]; hdr.innerHTML=`<button class="back" onclick="goHome()">&#8592; All subjects</button><div class="hrow"><h1>${d.name}</h1><button class="tourbtn" onclick="tourStart()">؟ جولة</button></div><p>${d.lec}</p>`; }
+
+function goHome(){cur=null;render()}
+window.goHome=goHome;
+function goSubj(sid,t){cur=sid;tab=t||"learn";qi=0;qscore=0;qmiss=[];fi=0;flipped=false;deck=null;ri=0;rshown=false;rdeck=null;render();window.scrollTo(0,0)}
+window.goSubj=goSubj;
+function setTab(t){tab=t;qi=0;qscore=0;qmiss=[];qlock=false;fi=0;flipped=false;deck=null;deckMode="all";ri=0;rshown=false;rdeck=null;render()}
+window.setTab=setTab;
+
+function home(){
+ headerHome();
+ let h="";
+ for(const sid of ['ct','bio']){
+  const d=DATA[sid], p=subjProgress(sid);
+  h+=`<button class="card subj" onclick="goSubj('${sid}')">
+    <h2>${d.name}</h2><div class="lec">${d.lec}</div>
+    <div class="bar"><div style="width:${p}%"></div></div>
+    <div class="pct">${p}% complete - ${d.sections.length} sections · ${d.flash.length} cards · ${d.quiz.length} quiz Qs · ${d.recall.length} recall Qs</div>
+  </button>`;
+ }
+ const pl=planStats();
+ h+=`<button class="card subj" onclick="goPlan()">
+   <h2>Study plan - جدول المذاكرة</h2><div class="lec">${pl.today>0?pl.today+" sessions today":'No sessions today'} · week ${pl.week} of ${PLAN_WEEKS}</div>
+   <div class="bar"><div style="width:${pl.pct}%"></div></div>
+   <div class="pct">${pl.done}/${pl.total} sessions done (${pl.pct}%)</div>
+ </button>`;
+ h+=`<div class="footer-note">Content from your lecture slides only. Figures are original redrawn illustrations, not the slide images.<br>Tap any English word for its Arabic translation · select a sentence for a paragraph translation.<br>Progress is saved on this device.</div>`;
+ app.innerHTML=h;
+}
+
+function tabsHtml(sid){
+ const t=[["learn","Learn"],["cards","Cards"],["quiz","Quiz"],["recall","Recall"],["prog","Progress"]];
+ return `<div class="tabs">`+t.map(([k,l])=>`<button class="${tab===k?'on':''}" onclick="setTab('${k}')">${l}</button>`).join("")+`</div>`;
+}
+
+function figHtml(fid){
+ if(SVGS[fid])return `<div class="svgfig">${SVGS[fid]}</div><div class="figcap">${SVG_CAPS[fid]||""}</div>`;
+ if(SCENES[fid])return `<div class="viewer" data-scene="${fid}"><div class="vtitle">${SCENES[fid].title}</div><div class="vhint">اسحب للف · إصبعين للتكبير · drag to rotate, pinch to zoom</div></div><div class="figcap">${FIG_META[fid]||""}</div>`;
+ return "";
+}
+
+function toggleLang(btn,secid){
+ S.lang[secid]=!S.lang[secid];save();
+ const card=btn.closest(".sec");
+ card.classList.toggle("show-ar",S.lang[secid]);
+ btn.classList.toggle("on",S.lang[secid]);
+ btn.setAttribute("aria-checked",S.lang[secid]?"true":"false");
+ btn.querySelector(".knob").textContent=S.lang[secid]?"ع":"EN";
+}
+window.toggleLang=toggleLang;
+
+function toggleTerm(el){ const n=el.nextElementSibling; n.style.display=n.style.display==="block"?"none":"block"; }
+window.toggleTerm=toggleTerm;
+
+function markRead(sid,id){
+ const s=st(sid); const i=s.read.indexOf(id);
+ if(i<0)s.read.push(id);else s.read.splice(i,1);
+ save();render();
+}
+window.markRead=markRead;
+
+function learn(sid){
+ const d=DATA[sid], s=st(sid);
+ let h="";
+ for(const sec of d.sections){
+  const done=s.read.includes(sec.id);
+  const arOn=!!S.lang[sec.id];
+  h+=`<div class="card sec ${arOn?'show-ar':''}" data-sec="${sec.id}">
+   <div class="sechead"><h3>${sec.title_en}</h3><button class="langbtn ${arOn?'on':''}" role="switch" aria-checked="${arOn?'true':'false'}" aria-label="Arabic translation" onclick="toggleLang(this,'${sec.id}')"><span class="knob">${arOn?'ع':'EN'}</span></button></div>
+   <div class="sec-ar-title">${sec.title_ar||""}</div>`;
+  sec.blocks.forEach((b,i)=>{
+   h+=`<div class="blk" data-bid="${sec.id}-${i}">${b.en}<div class="arb">${b.ar}</div></div>`;
+  });
+  for(const f of sec.figs||[])h+=figHtml(f);
+  if(sec.terms&&sec.terms.length){
+   h+=`<div class="chips">`+sec.terms.map(t=>`<button class="chip" onclick="toggleTerm(this)">${t[0]}</button><div class="termdef" style="display:none">${t[1]}<span class="ar">${t[2]||""}</span></div>`).join("")+`</div>`;
+  }
+  h+=`<button class="readbtn ${done?'done':''}" onclick="markRead('${sid}','${sec.id}')">${done?'✓ Read':'Mark as read'}</button></div>`;
+ }
+ return h;
+}
+
+/* ---------- flashcards ---------- */
+function getDeck(sid){
+ if(!deck){
+  const d=DATA[sid], s=st(sid);
+  deck=d.flash.map((c,i)=>i);
+  if(deckMode==="todo")deck=deck.filter(i=>!s.flash[i]);
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
+ }
+ return deck;
+}
+function cards(sid){
+ const d=DATA[sid], s=st(sid);
+ const mastered=Object.keys(s.flash).filter(k=>s.flash[k]).length;
+ const dk=getDeck(sid);
+ if(fi>=dk.length){
+  deck=null;
+  return `<div class="card center"><div class="score-big">Done</div>
+   <p>You finished this deck. Mastered ${mastered}/${d.flash.length} cards.</p>
+   <button class="btn" onclick="restartDeck('${sid}','all')">Review all again</button>
+   <button class="btn ghost" onclick="restartDeck('${sid}','todo')">Only cards not mastered (${d.flash.length-mastered})</button></div>`;
+ }
+ const c=d.flash[dk[fi]];
+ return `<div class="card">
+  <div class="prog">Card ${fi+1}/${dk.length} · mastered ${mastered}/${d.flash.length}</div>
+  <div class="flash card" style="margin:0;box-shadow:none;border:2px dashed #c7d2fe" onclick="flip()">
+   <div class="inner ${flipped?'backface':''}">${flipped?c.b:c.f}</div>
+   <div class="hint">${flipped?'':'tap to flip'}</div>
+  </div>
+  ${flipped?`<div class="fnav"><button class="no" onclick="flashAns('${sid}',false)">مش عرفتها</button><button class="yes" onclick="flashAns('${sid}',true)">عرفتها ✓</button></div>`:""}
+ </div>`;
+}
+function flip(){flipped=true;render()}
+window.flip=flip;
+function flashAns(sid,ok){ const s=st(sid);const dk=getDeck(sid); s.flash[dk[fi]]=ok;save(); fi++;flipped=false;render(); }
+window.flashAns=flashAns;
+function restartDeck(sid,mode){deck=null;deckMode=mode;fi=0;flipped=false;render()}
+window.restartDeck=restartDeck;
+
+/* ---------- quiz ---------- */
+function quiz(sid){
+ const d=DATA[sid], s=st(sid);
+ const Q=d.quiz;
+ if(qi>=Q.length){
+  const p=pct(qscore,Q.length);
+  if(p>s.quizBest)s.quizBest=p;
+  s.quizAtt++;save();
+  const msg=p>=90?"جامد جداً يا جينو 🔥":p>=70?"كويس، راجع الغلطات 👌":"محتاج مراجعة تانية، بس هتظبط 💪";
+  let h=`<div class="card center"><div class="score-big">${qscore}/${Q.length}</div>
+   <p><b>${p}%</b> · ${msg}</p>
+   <p class="small">Best score: ${s.quizBest}% · attempts: ${s.quizAtt}</p>
+   <button class="btn" onclick="restartQuiz()">حاول تاني · Retry</button></div>`;
+  if(qmiss.length){
+   h+=`<div class="card"><b>راجع الأسئلة دي:</b>`+qmiss.map(m=>`<div class="missed"><b>${m.q}</b><br>Correct: ${m.o[m.a]}<span class="ar" style="display:block;direction:rtl;text-align:right;color:#57534e">${m.w}</span></div>`).join("")+`</div>`;
+  }
+  return h;
+ }
+ const q=Q[qi];
+ let h=`<div class="card"><div class="prog">Question ${qi+1}/${Q.length} · score ${qscore}</div>
+  <div class="q">${q.q}</div>`;
+ q.o.forEach((op,i)=>{
+  let cls="opt";
+  if(qlock){if(i===q.a)cls+=" ok";else if(i===q.sel)cls+=" bad";}
+  h+=`<button class="${cls}" ${qlock?"disabled":""} onclick="ans('${sid}',${i})">${op}</button>`;
+ });
+ if(qlock){
+  const right=q.sel===q.a;
+  h+=`<div class="fb ${right?'ok':'bad'}">${right?'✅ Correct':'❌ Not quite'}<span class="ar">${q.w}</span></div>
+   <button class="btn" onclick="nextQ()">${qi+1===Q.length?'See result':'Next'}</button>`;
+ }
+ return h+`</div>`;
+}
+function ans(sid,i){ if(qlock)return; const q=DATA[sid].quiz[qi]; q.sel=i;qlock=true; if(i===q.a)qscore++;else qmiss.push(q); render(); }
+window.ans=ans;
+function nextQ(){qi++;qlock=false;render()}
+window.nextQ=nextQ;
+function restartQuiz(){qi=0;qscore=0;qmiss=[];qlock=false;DATA[cur].quiz.forEach(q=>delete q.sel);render()}
+window.restartQuiz=restartQuiz;
+
+/* ---------- recall ---------- */
+function getRdeck(sid){ if(!rdeck){rdeck=DATA[sid].recall.map((c,i)=>i)} return rdeck; }
+function recall(sid){
+ const d=DATA[sid], s=st(sid);
+ const dk=getRdeck(sid);
+ const done=Object.keys(s.recall).filter(k=>s.recall[k]).length;
+ if(ri>=dk.length){
+  rdeck=null;
+  return `<div class="card center"><div class="score-big">Done</div>
+  <p>You marked yourself right on ${done}/${d.recall.length} recall questions.</p>
+  <button class="btn" onclick="restartRecall()">Start over</button></div>`;
+ }
+ const c=d.recall[dk[ri]];
+ let h=`<div class="card"><div class="prog">Recall ${ri+1}/${dk.length} · answered right ${done}/${d.recall.length}</div>
+  <div class="q">${c.q}</div>
+  <p class="small">Answer out loud or in your head, then show the model answer and grade yourself honestly.</p>`;
+ if(rshown){
+  h+=`<div class="model">${c.a}<span class="ar" style="display:block;direction:rtl;text-align:right;margin-top:6px;color:#57534e">${c.w}</span></div>
+   <div class="fnav"><button class="no" onclick="recallAns('${sid}',false)">غلط / مش متأكد</button><button class="yes" onclick="recallAns('${sid}',true)">صح ✓</button></div>`;
+ }else{
+  h+=`<button class="btn ghost" onclick="showRecall()">Show model answer</button>`;
+ }
+ return h+`</div>`;
+}
+function showRecall(){rshown=true;render()}
+window.showRecall=showRecall;
+function recallAns(sid,ok){ const s=st(sid);const dk=getRdeck(sid); s.recall[dk[ri]]=ok;save(); ri++;rshown=false;render(); }
+window.recallAns=recallAns;
+function restartRecall(){ri=0;rshown=false;rdeck=null;render()}
+window.restartRecall=restartRecall;
+
+/* ---------- progress ---------- */
+function prog(sid){
+ const d=DATA[sid], s=st(sid);
+ const fm=Object.keys(s.flash).filter(k=>s.flash[k]).length;
+ const rd=Object.keys(s.recall).filter(k=>s.recall[k]).length;
+ const rows=[["Sections read", s.read.length, d.sections.length],["Cards mastered", fm, d.flash.length],["Recall answered right", rd, d.recall.length]];
+ let h=`<div class="card"><h3 style="margin-top:0">Your progress</h3>`;
+ for(const [l,n,m] of rows){
+  h+=`<div class="prow"><div class="lbl">${l}</div><div class="bar"><div style="width:${pct(n,m)}%"></div></div><div class="val">${n}/${m}</div></div>`;
+ }
+ h+=`<div class="prow"><div class="lbl">Quiz best</div><div class="bar"><div style="width:${s.quizBest}%"></div></div><div class="val">${s.quizBest}%</div></div>`;
+ h+=`<div class="stat-grid"><div class="s"><b>${s.quizAtt}</b><span>quiz attempts</span></div><div class="s"><b>${subjProgress(sid)}%</b><span>overall</span></div></div>`;
+ h+=`<button class="btn ghost" onclick="resetProg('${sid}')">Reset progress for this lecture</button></div>`;
+ return h;
+}
+function resetProg(sid){ if(confirm("Reset all progress for this lecture?")){S[sid]={read:[],flash:{},quizBest:0,quizAtt:0,recall:{}};save();render()} }
+window.resetProg=resetProg;
+
+/* ---------- translation popup ---------- */
+const pop=$("#pop");
+function showPop(x,y,html){
+ pop.innerHTML=html; pop.style.display="block";
+ const pw=Math.min(320,window.innerWidth-24);
+ pop.style.maxWidth=pw+"px";
+ let lx=Math.max(12,Math.min(x-40,window.innerWidth-pw-12));
+ let ly=y+18;
+ pop.style.left=lx+"px"; pop.style.top="0px";
+ pop.style.top=Math.min(ly,window.innerHeight-pop.offsetHeight-14)+"px";
+}
+function hidePop(){pop.style.display="none"}
+window.hidePop=hidePop;
+document.addEventListener("click",function(e){
+ if(pop.style.display==="block"&&!pop.contains(e.target)&&!e.target.classList.contains("chip"))hidePop();
+});
+
+function cleanWord(w){return (w||"").toLowerCase().replace(/^[^a-z]+|[^a-z%]+$/g,"")}
+function lookupWord(w){
+ w=cleanWord(w);
+ if(!w)return null;
+ if(GLOS[w])return {term:w,ar:GLOS[w][0],en:GLOS[w][1]};
+ if(w.endsWith("s")&&GLOS[w.slice(0,-1)]){const g=GLOS[w.slice(0,-1)];return{term:w.slice(0,-1),ar:g[0],en:g[1]}}
+ return null;
+}
+function wordAtPoint(x,y){
+ let node,off;
+ if(document.caretRangeFromPoint){const r=document.caretRangeFromPoint(x,y);if(!r)return null;node=r.startContainer;off=r.startOffset;}
+ else return null;
+ if(!node||node.nodeType!==3)return null;
+ const t=node.textContent;
+ const isL=c=>/[a-zA-Z\-']/.test(c);
+ let a=off,b=off;
+ while(a>0&&isL(t[a-1]))a--;
+ while(b<t.length&&isL(t[b]))b++;
+ const word=t.slice(a,b);
+ const rest=t.slice(b).trimStart();
+ const nw=(rest.match(/^[a-zA-Z\-']+/)||[""])[0];
+ return {word:word,next:nw};
+}
+app.addEventListener("click",function(e){
+ const sec=e.target.closest(".sec,.flash,.q,.missed,.model,.opt");
+ if(!sec)return;
+ if(e.target.closest("button,a,canvas,.langbtn,.chip,.readbtn,.fnav"))return;
+ if(window.getSelection&&String(window.getSelection()).length>0)return;
+ const w=wordAtPoint(e.clientX,e.clientY);
+ if(!w||!w.word||w.word.length<2)return;
+ let hit=lookupWord(w.word+" "+w.next)||lookupWord(w.word);
+ if(hit){
+  showPop(e.clientX,e.clientY,`<div class="par">${hit.ar}</div>${hit.en?`<div class="pen">${hit.term} - ${hit.en}</div>`:`<div class="pen">${hit.term}</div>`}<div class="prow2"><button onclick="speak('${hit.term.replace(/'/g,"")}')">🔊 نطق</button><button onclick="hidePop()">قفل</button></div>`);
+ }else{
+  showPop(e.clientX,e.clientY,`<div class="par none">"${w.word}" مفيش ترجمة جاهزة ليها</div><div class="pen">القاموس بيغطي المصطلحات العلمية المهمة بس.</div><div class="prow2"><button onclick="speak('${w.word.replace(/'/g,"")}')">🔊 نطق</button><button onclick="hidePop()">قفل</button></div>`);
+ }
+});
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang="en-US";speechSynthesis.speak(u)}catch(e){}}
+window.speak=speak;
+
+function onSelectEnd(e){
+ const sec=e.target.closest&&e.target.closest(".sec");
+ if(!sec)return;
+ setTimeout(()=>{
+  const sel=window.getSelection();
+  const txt=sel?String(sel).trim():"";
+  if(txt.length<3)return;
+  const node=sel.anchorNode&&(sel.anchorNode.nodeType===3?sel.anchorNode.parentElement:sel.anchorNode);
+  const blk=node&&node.closest?node.closest(".blk"):null;
+  const r=sel.getRangeAt(0).getBoundingClientRect();
+  if(blk){
+   const arb=blk.querySelector(".arb");
+   if(arb){
+    showPop(r.left+r.width/2,r.bottom,`<div class="par">${arb.textContent}</div><div class="pen">ترجمة الفقرة (معدّة مسبقاً من المحاضرة)</div><div class="prow2"><button onclick="hidePop()">قفل</button></div>`);
+    return;
+   }
+  }
+  showPop(r.left+r.width/2,r.bottom,`<div class="par none">مفيش ترجمة جاهزة للتحديد ده</div><div class="pen">الترجمة متاحة لكلمات القاموس وفقرات الشرح الرئيسية بس.</div><div class="prow2"><button onclick="hidePop()">قفل</button></div>`);
+ },60);
+}
+app.addEventListener("mouseup",onSelectEnd);
+app.addEventListener("touchend",onSelectEnd);
+
+/* ---------- 3D viewers ---------- */
+const viewers=[];
+function makeLabel(T,text){
+ const c=document.createElement("canvas");c.width=512;c.height=64;
+ const x=c.getContext("2d");
+ x.fillStyle="rgba(20,15,50,0.72)";x.fillRect(0,0,512,64);
+ x.font="bold 30px Arial";x.fillStyle="#fff";x.textAlign="center";x.textBaseline="middle";
+ x.fillText(text,256,34);
+ const tx=new T.CanvasTexture(c);
+ const sp=new T.Sprite(new T.SpriteMaterial({map:tx,transparent:true}));
+ sp.scale.set(2.6,0.33,1);
+ return sp;
+}
+function initViewer(el){
+ const sid=el.dataset.scene;
+ const def=SCENES[sid];if(!def)return;
+ const W=el.clientWidth,H=270;
+ const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+ renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ el.appendChild(renderer.domElement);
+ const scene=new THREE.Scene();
+ const cam=new THREE.PerspectiveCamera(45,W/H,0.1,100);
+ cam.position.set(0,0.5,9);
+ scene.add(new THREE.AmbientLight(0xffffff,0.75));
+ const dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(4,6,6);scene.add(dl);
+ const dl2=new THREE.DirectionalLight(0xa5b4fc,0.35);dl2.position.set(-5,-3,-4);scene.add(dl2);
+ const g=new THREE.Group();scene.add(g);
+ def.build(g,THREE,function(t,x,y,z){const s=makeLabel(THREE,t);s.position.set(x,y,z);g.add(s);});
+ // frame content
+ const box=new THREE.Box3().setFromObject(g);
+ const c=box.getCenter(new THREE.Vector3()),sz=box.getSize(new THREE.Vector3()).length();
+ g.traverse(o=>{if(o.isSprite)o.scale.multiplyScalar(sz/6)});
+ g.position.sub(c);
+ cam.position.set(0,0,Math.max(6,sz*1.15));
+ let ry=0.4,rx=0.15,dist=cam.position.z,auto=true,idleT=null;
+ const ptrs=new Map();let lastD=0;
+ const cv=renderer.domElement;
+ cv.style.touchAction="none";
+ cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});auto=false;if(idleT)clearTimeout(idleT);});
+ cv.addEventListener("pointermove",e=>{
+  if(!ptrs.has(e.pointerId))return;
+  const p=ptrs.get(e.pointerId);
+  if(ptrs.size===1){ry+=(e.clientX-p.x)*0.012;rx+=(e.clientY-p.y)*0.012;rx=Math.max(-1.4,Math.min(1.4,rx));}
+  p.x=e.clientX;p.y=e.clientY;
+  if(ptrs.size===2){const a=[...ptrs.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(lastD>0)dist=Math.max(sz*0.5,Math.min(sz*2.4,dist*lastD/d));lastD=d;}
+ });
+ function up(e){ptrs.delete(e.pointerId);if(ptrs.size<2)lastD=0;idleT=setTimeout(()=>auto=true,2600);}
+ cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+ cv.addEventListener("wheel",e=>{e.preventDefault();dist=Math.max(sz*0.5,Math.min(sz*2.4,dist+e.deltaY*0.01));auto=false;},{passive:false});
+ let visible=false;
+ new IntersectionObserver(en=>{visible=en[0].isIntersecting},{threshold:0.05}).observe(el);
+ function loop(){
+  requestAnimationFrame(loop);
+  if(!visible)return;
+  if(auto)ry+=0.004;
+  g.rotation.y=ry;g.rotation.x=rx;
+  cam.position.z+=(dist-cam.position.z)*0.18;
+  renderer.render(scene,cam);
+ }
+ loop();
+}
+function initViewers(){
+ document.querySelectorAll(".viewer:not([data-init])").forEach(el=>{el.dataset.init="1";initViewer(el)});
+}
+
+
+/* ---------- study plan ---------- */
+const PLAN_WEEKS=7;
+const DAYS=[[6,"السبت","Sat"],[0,"الأحد","Sun"],[1,"الاتنين","Mon"],[2,"التلات","Tue"],[3,"الأربع","Wed"],[4,"الخميس","Thu"],[5,"الجمعة","Fri"]];
+let planWeek=1, planFormDay=null;
+function planState(){
+ if(!S.plan){
+  S.plan={};
+  // prefill: Sat+Tue = next CT lecture, Sun+Wed = next Radio lecture, Fri = review
+  let ctI=0,bioI=0;
+  for(let w=1;w<=PLAN_WEEKS;w++){
+   S.plan[w]={6:[],0:[],1:[],2:[],3:[],4:[],5:[]};
+   const rev=[];
+   if(ctI<LECTURES.ct.length){S.plan[w][6].push({s:"ct",l:ctI,done:false});rev.push("CT "+(ctI+1));ctI++}
+   if(bioI<LECTURES.bio.length){S.plan[w][0].push({s:"bio",l:bioI,done:false});rev.push("Radio "+(bioI+1));bioI++}
+   if(ctI<LECTURES.ct.length){S.plan[w][2].push({s:"ct",l:ctI,done:false});rev.push("CT "+(ctI+1));ctI++}
+   if(bioI<LECTURES.bio.length){S.plan[w][3].push({s:"bio",l:bioI,done:false});rev.push("Radio "+(bioI+1));bioI++}
+   if(rev.length)S.plan[w][5].push({s:"rev",l:-1,done:false,label:"مراجعة الأسبوع: "+rev.join(" + ")+" (كروت + كويز + تسميع)"});
+  }
+  save();
+ }
+ return S.plan;
+}
+function planStats(){
+ const p=planState();
+ let done=0,total=0;
+ for(const w of Object.values(p))for(const d of Object.values(w))for(const s of d){total++;if(s.done)done++}
+ const jsDay=new Date().getDay();
+ let wk=1;
+ outer: for(let w=1;w<=PLAN_WEEKS;w++){for(const d of Object.values(p[w]))for(const s of d){if(!s.done){wk=w;break outer}}wk=PLAN_WEEKS}
+ const today=(p[wk]&&p[wk][jsDay])?p[wk][jsDay].filter(s=>!s.done).length:0;
+ return {done,total,pct:pct(done,total),week:wk,today};
+}
+function goPlan(){cur="plan";planWeek=planStats().week;planFormDay=null;render();window.scrollTo(0,0)}
+window.goPlan=goPlan;
+function setWeek(w){planWeek=w;planFormDay=null;render()}
+window.setWeek=setWeek;
+function planView(){
+ const p=planState();
+ const jsDay=new Date().getDay();
+ const stats=planStats();
+ let h=`<div class="card"><h3 style="margin-top:0">جدول المذاكرة · Study plan</h3>
+  <p class="small" style="margin-top:0">خطة مقترحة: محاضرتين CT ومحاضرتين راديوبايولوجي في الأسبوع، والجمعة مراجعة. عدّلها زي ما يناسبك.</p>
+  <div class="bar" style="margin:8px 0"><div style="width:${stats.pct}%"></div></div>
+  <div class="pct">${stats.done}/${stats.total} sessions done</div></div>
+  <div class="card" style="padding:12px"><div class="weekrow">`;
+ for(let w=1;w<=PLAN_WEEKS;w++)h+=`<button class="${w===planWeek?'on':''}" onclick="setWeek(${w})">أسبوع ${w}</button>`;
+ h+=`</div>`;
+ const wp=p[planWeek];
+ for(const [jsd,arName,enName] of DAYS){
+  const list=wp[jsd]||[];
+  const isToday=(planWeek===stats.week&&jsd===jsDay);
+  h+=`<div class="daycol"><div class="dh"><b>${arName} · ${enName}</b>${isToday?'<span class="today">اليوم</span>':''}<button class="chk" style="background:#eef2ff;color:#3730a3;border:0;border-radius:8px;padding:5px 10px;font-weight:800;cursor:pointer" onclick="planForm(${jsd})">+ إضافة</button></div>`;
+  if(planFormDay===jsd){
+   h+=`<div class="addbox"><select id="pf-subj" onchange="planLecOpts()"><option value="ct">Basic CT Radiography</option><option value="bio">Radiobiology</option><option value="rev">مراجعة / Review</option></select>
+    <select id="pf-lec"></select>
+    <button class="btn" style="margin-top:6px;padding:10px" onclick="planAdd(${jsd})">أضف لليوم ده</button></div>`;
+  }
+  if(!list.length)h+=`<div class="small" style="margin:8px 0">مفيش جلسات - راحة 😌</div>`;
+  list.forEach((s,i)=>{
+   const label=s.s==="rev"?(s.label||"مراجعة"):(DATA[s.s].name+" - Lec "+(s.l+1)+": "+LECTURES[s.s][s.l]);
+   const inApp=(s.s!=="rev"&&s.l===0);
+   h+=`<div class="sess ${s.done?'done':''}"><div class="dot"></div><div class="si">${label}<small>${s.s==="rev"?"مراجعة أسبوعية":(inApp?"موجودة في التطبيق ✅":"قريباً في التطبيق")}</small></div>
+    <button class="chk" onclick="planToggle(${jsd},${i})">${s.done?'✓':'تم'}</button>
+    <button class="del" onclick="planDel(${jsd},${i})">حذف</button></div>`;
+  });
+  h+=`</div>`;
+ }
+ h+=`</div>`;
+ return h;
+}
+function planForm(jsd){planFormDay=(planFormDay===jsd?null:jsd);render();if(planFormDay!==null)planLecOpts()}
+window.planForm=planForm;
+function planLecOpts(){
+ const subj=document.getElementById("pf-subj").value;
+ const sel=document.getElementById("pf-lec");
+ let o="";
+ if(subj==="rev")o=`<option value="-1">مراجعة عامة</option>`;
+ else LECTURES[subj].forEach((l,i)=>{o+=`<option value="${i}">Lec ${i+1}: ${l}</option>`});
+ sel.innerHTML=o;
+}
+window.planLecOpts=planLecOpts;
+function planAdd(jsd){
+ const subj=document.getElementById("pf-subj").value;
+ const lec=parseInt(document.getElementById("pf-lec").value,10);
+ const p=planState();
+ p[planWeek][jsd].push(subj==="rev"?{s:"rev",l:-1,done:false,label:"مراجعة عامة"}:{s:subj,l:lec,done:false});
+ save();planFormDay=null;render();
+}
+window.planAdd=planAdd;
+function planToggle(jsd,i){const p=planState();p[planWeek][jsd][i].done=!p[planWeek][jsd][i].done;save();render()}
+window.planToggle=planToggle;
+function planDel(jsd,i){const p=planState();p[planWeek][jsd].splice(i,1);save();render()}
+window.planDel=planDel;
+
+/* ---------- guided tour ---------- */
+const TOUR=[
+ {go:null,sel:null,text:"أهلاً بيك في Jino Study! دي جولة سريعة على كل المميزات. دقيقة واحدة بس."},
+ {go:"home",sel:".subj",text:"كل بطاقة مادة فيها محاضرة كاملة: شرح وكروت وكويز وتسميع وتقدم. دوس على المادة تفتحها."},
+ {go:["ct","learn"],sel:".tabs",text:"التبويبات الخمسة: Learn للشرح، Cards للحفظ، Quiz للاختبار، Recall للتسميع، Progress لمتابعة مستواك."},
+ {go:["ct","learn"],sel:".langbtn",text:"سويتش اللغة: حرّكه لناحية ع يظهر الترجمة العربية تحت كل فقرة إنجليزي في السكشن ده بس، وارجعه EN يرجع إنجليزي بس."},
+ {go:["ct","learn"],sel:".sec .blk p",text:"دوس على أي كلمة إنجليزية في الشرح تطلعلك ترجمتها العلمية بالعربي ومعناها ونطقها. ولو حددت جملة، تظهر ترجمة الفقرة كلها. الكلمات اللي مش في القاموس هتقولك بصراحة إن مفيش ترجمة."},
+ {go:["ct","learn"],sel:".chip",text:"المصطلحات المهمة آخر كل سكشن: دوس على المصطلح يظهر تعريفه إنجليزي وعربي."},
+ {go:["ct","learn"],sel:".viewer",text:"الأشكال التوضيحية بقت مرسومة من الصفر وبعضها 3D: اسحب بإصبع للف، وإصبعين للتقريب والتبعيد."},
+ {go:["ct","learn"],sel:".readbtn",text:"لما تخلص سكشن، علّمه كمقروء عشان يتحسب في تقدمك."},
+ {go:["ct","cards"],sel:".flash",text:"كروت الحفظ: دوس على الكارت يتقلب، وبعدين قيّم نفسك بصراحة: عرفتها ولا مش عرفتها."},
+ {go:["ct","quiz"],sel:".card",text:"الكويز: اختر إجابة وشوف التصحيح والشرح بالعربي فوراً. درجتك بتتسجل وأفضل نتيجة بتتحفظ."},
+ {go:["ct","recall"],sel:".card",text:"التسميع: جاوب من دماغك الأول، وبعدين اعرض الإجابة النموذجية وقارن وقيّم نفسك."},
+ {go:["ct","prog"],sel:".card",text:"صفحة التقدم: نسبتك في كل جزء، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
+ {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة (محاضرتين من كل مادة في الأسبوع والجمعة مراجعة)، تقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. نسبة إنجازك فوق."},
+ {go:"home",sel:null,text:"خلصت الجولة! تقدر تعيدها في أي وقت من زرار (؟ جولة) فوق. بالتوفيق في المذاكرة يا جينو 💪"},
+];
+let tourI=0;
+function tourStart(){tourI=0;showTourStep()}
+window.tourStart=tourStart;
+function showTourStep(){
+ const s=TOUR[tourI];
+ if(s.go){if(s.go==="home"){if(cur)goHome()}else if(cur!==s.go[0]||tab!==s.go[1])goSubj(s.go[0],s.go[1]);}
+ setTimeout(()=>{
+  $("#tourbg").style.display="block";
+  const card=$("#tourcard");
+  $("#tourtext").textContent=s.text;
+  $("#tourcount").textContent=(tourI+1)+" / "+TOUR.length;
+  $("#tournext").textContent=tourI===TOUR.length-1?"خلاص":"التالي";
+  card.style.display="block";
+  const hl=$("#tourhl");
+  const el=s.sel?document.querySelector(s.sel):null;
+  if(el){
+   el.scrollIntoView({block:"center"});
+   setTimeout(()=>{
+    const r=el.getBoundingClientRect();
+    hl.style.display="block";
+    hl.style.left=(r.left-6)+"px";hl.style.top=(r.top-6)+"px";
+    hl.style.width=(r.width+12)+"px";hl.style.height=(r.height+12)+"px";
+    const ch=card.offsetHeight;
+    let top=r.bottom+14;
+    if(top+ch>window.innerHeight-10)top=Math.max(10,r.top-ch-14);
+    card.style.top=top+"px";
+   },420);
+  }else{
+   hl.style.display="none";
+   card.style.top="30%";
+  }
+ },s.go?380:60);
+}
+function tourNext(){tourI++;if(tourI>=TOUR.length){tourEnd();return}showTourStep()}
+window.tourNext=tourNext;
+function tourEnd(){$("#tourbg").style.display="none";$("#tourhl").style.display="none";$("#tourcard").style.display="none";S.tourDone=true;save();goHome()}
+window.tourEnd=tourEnd;
+
+function render(){
+ if(!cur){home();return}
+ if(cur==="plan"){
+  hdr.innerHTML=`<button class="back" onclick="goHome()">&#8592; All subjects</button><div class="hrow"><h1>Study plan</h1><button class="tourbtn" onclick="tourStart()">؟ جولة</button></div><p>جدول المذاكرة الأسبوعي</p>`;
+  app.innerHTML=planView();
+  return;
+ }
+ headerSubj(cur);
+ let body="";
+ if(tab==="learn")body=learn(cur);
+ else if(tab==="cards")body=cards(cur);
+ else if(tab==="quiz")body=quiz(cur);
+ else if(tab==="recall")body=recall(cur);
+ else body=prog(cur);
+ app.innerHTML=tabsHtml(cur)+body;
+ initViewers();
+}
+render();
+if(!S.tourDone){setTimeout(tourStart,700)}
+if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>
