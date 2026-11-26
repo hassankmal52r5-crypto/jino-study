@@ -1,5 +1,5 @@
-const CACHE = "jinostudy-v3";
-const ASSETS = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
+const CACHE = "jinostudy-v4";
+const ASSETS = ["./", "index.html", "manifest.webmanifest", "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
