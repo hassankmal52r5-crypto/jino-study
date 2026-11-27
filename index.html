@@ -973,7 +973,7 @@ function planView(){
  const jsDay=new Date().getDay();
  const stats=planStats();
  let h=`<div class="card"><h3 style="margin-top:0">جدول المذاكرة · Study plan</h3>
-  <p class="small" style="margin-top:0">خطة مقترحة جاهزة لمادتين: محاضرتين CT ومحاضرتين راديوبايولوجي في الأسبوع، والجمعة مراجعة. باقي المواد ضيفها بزرار + إضافة. عدّلها زي ما يناسبك.</p>
+  <p class="small" dir="rtl" style="margin-top:0;text-align:right">خطة مقترحة جاهزة لمادتين: محاضرتين CT ومحاضرتين راديوبايولوجي في الأسبوع، والجمعة مراجعة. باقي المواد ضيفها بزرار + إضافة. عدّلها زي ما يناسبك.</p>
   <div class="bar" style="margin:8px 0"><div style="width:${stats.pct}%"></div></div>
   <div class="pct">${stats.done}/${stats.total} sessions done</div></div>
   <div class="card" style="padding:12px"><div class="weekrow">`;
