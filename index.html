@@ -937,19 +937,27 @@ const PLAN_WEEKS=7;
 const DAYS=[[6,"السبت","Sat"],[0,"الأحد","Sun"],[1,"الاتنين","Mon"],[2,"التلات","Tue"],[3,"الأربع","Wed"],[4,"الخميس","Thu"],[5,"الجمعة","Fri"]];
 let planWeek=1, planFormDay=null;
 function planState(){
- if(!S.plan){
+ if(!S.plan||S.planV!==2){
+  // plan v2: all subjects, interleaved so every subject finishes by week 7; Friday = weekly review
+  const keys=Object.keys(SUBJECTS), tot={}, ptr={};
+  let N=0; keys.forEach(k=>{tot[k]=LECTURES[k].length;ptr[k]=0;N+=tot[k]});
+  const queue=[];
+  for(let n=0;n<N;n++){
+   let best=null,bv=-1;
+   keys.forEach(k=>{ if(ptr[k]<tot[k]){const v=(tot[k]-ptr[k])/tot[k]; if(v>bv+1e-9){bv=v;best=k}} });
+   queue.push({s:best,l:ptr[best]});ptr[best]++;
+  }
+  const order=[6,0,1,2,3,4];
   S.plan={};
-  // prefill: Sat+Tue = next CT lecture, Sun+Wed = next Radio lecture, Fri = review
-  let ctI=0,bioI=0;
   for(let w=1;w<=PLAN_WEEKS;w++){
    S.plan[w]={6:[],0:[],1:[],2:[],3:[],4:[],5:[]};
-   const rev=[];
-   if(ctI<LECTURES.ct.length){S.plan[w][6].push({s:"ct",l:ctI,done:false});rev.push("CT "+(ctI+1));ctI++}
-   if(bioI<LECTURES.bio.length){S.plan[w][0].push({s:"bio",l:bioI,done:false});rev.push("Radio "+(bioI+1));bioI++}
-   if(ctI<LECTURES.ct.length){S.plan[w][2].push({s:"ct",l:ctI,done:false});rev.push("CT "+(ctI+1));ctI++}
-   if(bioI<LECTURES.bio.length){S.plan[w][3].push({s:"bio",l:bioI,done:false});rev.push("Radio "+(bioI+1));bioI++}
-   if(rev.length)S.plan[w][5].push({s:"rev",l:-1,done:false,label:"مراجعة الأسبوع: "+rev.join(" + ")+" (كروت + كويز + تسميع)"});
+   const items=queue.slice(Math.floor(N*(w-1)/PLAN_WEEKS),Math.floor(N*w/PLAN_WEEKS));
+   {let at=0;order.forEach((dd,di)=>{const c=Math.floor(items.length/6)+(di<items.length%6?1:0);for(let z=0;z<c;z++){const it=items[at++];S.plan[w][dd].push({s:it.s,l:it.l,done:false})}})}
+   const by={};items.forEach(it=>{(by[it.s]=by[it.s]||[]).push(it.l+1)});
+   const parts=keys.filter(k=>by[k]).map(k=>{const a=by[k];return SUBJECTS[k].short+" "+(a.length>1?a[0]+"-"+a[a.length-1]:a[0])});
+   if(parts.length)S.plan[w][5].push({s:"rev",l:-1,done:false,label:"مراجعة الأسبوع: "+parts.join(" + ")+" (كروت + كويز + تسميع)"});
   }
+  S.planV=2;
   save();
  }
  return S.plan;
@@ -973,7 +981,7 @@ function planView(){
  const jsDay=new Date().getDay();
  const stats=planStats();
  let h=`<div class="card"><h3 style="margin-top:0">جدول المذاكرة · Study plan</h3>
-  <p class="small" dir="rtl" style="margin-top:0;text-align:right">خطة مقترحة جاهزة لمادتين: محاضرتين CT ومحاضرتين راديوبايولوجي في الأسبوع، والجمعة مراجعة. باقي المواد ضيفها بزرار + إضافة. عدّلها زي ما يناسبك.</p>
+  <p class="small" dir="rtl" style="margin-top:0;text-align:right">خطة مقترحة لكل المواد الخمسة: حوالي 10 محاضرات في الأسبوع من السبت للخميس (بتتوزع على المواد مع بعض)، والجمعة مراجعة الأسبوع. عدّلها زي ما يناسبك.</p>
   <div class="bar" style="margin:8px 0"><div style="width:${stats.pct}%"></div></div>
   <div class="pct">${stats.done}/${stats.total} sessions done</div></div>
   <div class="card" style="padding:12px"><div class="weekrow">`;
@@ -1043,7 +1051,7 @@ const TOUR=[
  {go:["ct1","quiz"],sel:".card",text:"الكويز: اختر إجابة وشوف التصحيح والشرح بالعربي فوراً. درجتك بتتسجل وأفضل نتيجة بتتحفظ لكل محاضرة لوحدها."},
  {go:["ct1","recall"],sel:".card",text:"التسميع: جاوب من دماغك الأول، وبعدين اعرض الإجابة النموذجية وقارن وقيّم نفسك."},
  {go:["ct1","prog"],sel:".card",text:"صفحة التقدم: نسبتك في كل جزء من المحاضرة دي، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
- {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة لـ CT وراديوبايولوجي (محاضرتين من كل واحدة في الأسبوع والجمعة مراجعة)، وباقي المواد تضيفها بزرار (+ إضافة)، تقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. والمحاضرات الموجودة في التطبيق ليها زرار (افتح) يوديك عليها على طول."},
+ {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة لكل المواد الخمسة (حوالي 10 محاضرات في الأسبوع من السبت للخميس والجمعة مراجعة)، تقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. والمحاضرات الموجودة في التطبيق ليها زرار (افتح) يوديك عليها على طول."},
  {go:"home",sel:null,text:"خلصت الجولة! تقدر تعيدها في أي وقت من زرار (؟ جولة) فوق. بالتوفيق في المذاكرة يا جينو 💪"},
 ];
 let tourI=0;
