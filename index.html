@@ -92,6 +92,7 @@ header p{margin:4px 0 0;opacity:.85;font-size:13px}
 .svgfig{position:relative;cursor:pointer;padding-top:36px}
 .svgfig .vexp{background:#ede9fe;border-color:#c4b5fd;color:#4c1d95}
 #vfull .vfhint{color:#a5a5d0;font-size:11px;text-align:center;padding:0 10px 12px;direction:rtl}
+.pic{position:relative;margin:10px 0;cursor:zoom-in}.pic img{width:100%;border-radius:10px;border:1px solid #e5e0f5;display:block;background:#fff}.pic .vexp{background:#ede9fe;border-color:#c4b5fd;color:#6d28d9}
 .figcap{font-size:12px;color:var(--muted);margin:6px 2px 0;text-align:center;line-height:1.5}
 /* flashcards */
 .flash{min-height:200px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;position:relative}
@@ -195,6 +196,7 @@ const FIG_META = {};
 const SCENES={};
 
 
+const PICS = {"photo1": [["photo1_12.webp", 12, 17346], ["photo1_8.webp", 8, 40354]], "photo2": [["photo2_16.webp", 16, 37706], ["photo2_13.webp", 13, 32358]], "photo3": [["photo3_43.webp", 43, 39826]], "photo4": [["photo4_13.webp", 13, 130784]], "photo5": [["photo5_12.webp", 12, 24434], ["photo5_21.webp", 21, 16256]], "photo8": [["photo8_2.webp", 2, 19734]], "photo10": [["photo10_9.webp", 9, 12040]], "photo11": [["photo11_13.webp", 13, 105910]], "photo12": [["photo12_17.webp", 17, 40580], ["photo12_43.webp", 43, 51432]], "photo_extra": [["photo_extra_16.webp", 16, 37706], ["photo_extra_13.webp", 13, 32358]], "tech1": [["tech1_20.webp", 20, 17564], ["tech1_16.webp", 16, 12674]], "tech2": [["tech2_9.webp", 9, 15320]], "tech3": [["tech3_19.webp", 19, 11682], ["tech3_20.webp", 20, 8008]], "tech4": [["tech4_22.webp", 22, 14896], ["tech4_23.webp", 23, 14344]], "tech5": [["tech5_35.webp", 35, 6842], ["tech5_34.webp", 34, 8070]], "tech6": [["tech6_3.webp", 3, 14060], ["tech6_2.webp", 2, 9108]], "tech8": [["tech8_3.webp", 3, 8068], ["tech8_6.webp", 6, 8802]], "tech9": [["tech9_17.webp", 17, 19970]], "tech10": [["tech10_37.webp", 37, 14900], ["tech10_43.webp", 43, 8642]], "tech11": [["tech11_27.webp", 27, 16950]], "tech12": [["tech12_20.webp", 20, 7888], ["tech12_17.webp", 17, 6370]], "tech13": [["tech13_29.webp", 29, 16518], ["tech13_30.webp", 30, 10696]], "tech14": [["tech14_4.webp", 4, 10190], ["tech14_11.webp", 11, 17024]], "tech15": [["tech15_4.webp", 4, 12614]], "tech16": [["tech16_27.webp", 27, 15006], ["tech16_8.webp", 8, 13380]], "tech17": [["tech17_7.webp", 7, 21898], ["tech17_9.webp", 9, 12370]], "tech18": [["tech18_27.webp", 27, 17778], ["tech18_5.webp", 5, 33232]], "tech19": [["tech19_6.webp", 6, 26586], ["tech19_46.webp", 46, 6526]], "np7": [["np7_20.webp", 20, 12030], ["np7_30.webp", 30, 28736]], "np8": [["np8_14.webp", 14, 21410]], "np9": [["np9_3.webp", 3, 13984], ["np9_16.webp", 16, 8670]], "np10": [["np10_2.webp", 2, 14146]], "bio1": [["bio1_25.webp", 25, 31504], ["bio1_26.webp", 26, 39940]], "bio2": [["bio2_4.webp", 4, 33984], ["bio2_5.webp", 5, 41854]], "bio3": [["bio3_18.webp", 18, 27686]], "bio7": [["bio7_17.webp", 17, 36934]], "bio11": [["bio11_6.webp", 6, 25490], ["bio11_10.webp", 10, 11100]], "bio12": [["bio12_8.webp", 8, 12592], ["bio12_4.webp", 4, 24026]], "bio13": [["bio13_3.webp", 3, 14892]], "bio14": [["bio14_25.webp", 25, 59338]], "ct1": [["ct1_24.webp", 24, 28630], ["ct1_14.webp", 14, 14378]], "ct2": [["ct2_27.webp", 27, 19418], ["ct2_4.webp", 4, 14608]], "ct3": [["ct3_6.webp", 6, 28676]], "ct4": [["ct4_31.webp", 31, 9412]], "ct5": [["ct5_29.webp", 29, 30274], ["ct5_21.webp", 21, 36366]], "ct6": [["ct6_24.webp", 24, 16140], ["ct6_17.webp", 17, 11738]], "ct7": [["ct7_47.webp", 47, 8952], ["ct7_12.webp", 12, 12490]], "ct10": [["ct10_17.webp", 17, 6526]], "ct12": [["ct12_5.webp", 5, 11698]]};
 const STORE_KEY="jinoStudyV1";
 let S={};
 try{S=JSON.parse(localStorage.getItem(STORE_KEY)||"{}")}catch(e){S={}}
@@ -324,9 +326,25 @@ function markRead(sid,id){
 }
 window.markRead=markRead;
 
+function picsFor(sid,i){
+ const ps=PICS[sid]||[],n=DATA[sid].sections.length;let h="";
+ ps.forEach((p,j)=>{if(Math.min(n-1,Math.floor((j+0.5)*n/ps.length))===i)h+=`<div class="pic" onclick="openPic('${p[0]}')"><button class="vexp" type="button">⤢ تكبير</button><img alt="slide ${p[1]}" data-f="${p[0]}"><div class="figcap">صورة من سلايدات المحاضرة · slide ${p[1]} · اضغط للتكبير</div></div>`});
+ return h}
+function openPic(src){
+ if(fullV)return;
+ const o=document.createElement("div");o.id="vfull";
+ o.innerHTML=`<div class="vfh"><div class="vft">Slide</div><button class="vfx" onclick="closeFull()">✕ إغلاق · Close</button></div><div class="svgsc"><div class="svgin"><img src="${(window.FIGDATA||{})[src]||''}" style="width:100%;display:block;border-radius:8px;background:#fff"></div></div><div class="svgz"><button onclick="picZ(-1)">−</button><button onclick="picZ(1)">+</button></div><div class="vfhint">اسحب للتحريك · زرار + و − للتكبير · drag to pan, use + / − to zoom</div>`;
+ document.body.appendChild(o);window.__vfull=1;history.pushState({vfull:1},"");
+ fullV={V:null,o:o,z:1};picZ(0);
+}
+function picZ(d){if(!fullV)return;fullV.z=Math.max(1,Math.min(3,fullV.z+d*0.5));fullV.o.querySelector(".svgin").style.width=(fullV.z*92)+"vw"}
+window.openPic=openPic;
+function hydrate(){document.querySelectorAll('img[data-f]:not([src])').forEach(i=>{const v=window.FIGDATA&&FIGDATA[i.dataset.f];if(v)i.src=v})}
+window.hydrate=hydrate;
+new MutationObserver(hydrate).observe(document.documentElement,{childList:true,subtree:true});
 function learn(sid){
  const d=DATA[sid], s=st(sid);
- let h="";
+ let h="";let secIdx=0;
  for(const sec of d.sections){
   const done=s.read.includes(sec.id);
   const arOn=!!S.lang[sec.id];
@@ -337,6 +355,7 @@ function learn(sid){
    h+=`<div class="blk" data-bid="${sec.id}-${i}">${b.en}<div class="arb">${b.ar}</div></div>`;
   });
   for(const f of sec.figs||[])h+=figHtml(f);
+  h+=picsFor(sid,secIdx++);
   if(sec.terms&&sec.terms.length){
    h+=`<div class="chips">`+sec.terms.map(t=>`<button class="chip" onclick="toggleTerm(this)">${t[0]}</button><div class="termdef" style="display:none">${t[1]}<span class="ar">${t[2]||""}</span></div>`).join("")+`</div>`;
   }
@@ -947,6 +966,7 @@ const TOUR=[
  {go:["ct1","learn"],sel:".chip",text:"المصطلحات المهمة آخر كل سكشن: دوس على المصطلح يظهر تعريفه إنجليزي وعربي."},
  {go:["ct1","learn"],sel:".svgfig",text:"الرسومات دي 2D مسطّحة بتشرح الخلية والأنسجة والمخ والجانتري. الأرقام الصفرا على الرسمة بتفسرها القايمة تحتها."},
  {go:["ct1","learn"],sel:".svgfig",text:"الرسومات التوضيحية (2D) كمان: دوس على الرسمة أو زرار «⤢ تكبير» تفتح على الشاشة كلها بحجم كبير، حرّكها بإصبعك وكبّرها بزراري + و −."},
+ {go:["ct1","learn"],sel:".pic",text:"صور من سلايدات المحاضرة: أشعة وصور أجهزة ورسومات حقيقية من السلايدات نفسها وسط السكاشن (مش كل محاضرة فيها صور). دوس على الصورة تفتح بالحجم الكبير، حرّكها بإصبعك وكبّرها بزراري + و −."},
  {go:["ct1","learn"],sel:".readbtn",text:"لما تخلص سكشن، علّمه كمقروء: نسبة المحاضرة بتزيد سكشن بسكشن."},
  {go:["ct1","cards"],sel:".flash",text:"كروت الحفظ: دوس على الكارت يتقلب، وبعدين قيّم نفسك بصراحة: عرفتها ولا مش عرفتها."},
  {go:["ct1","notes"],sel:".nlist",text:"تبويب Notes (قبل الكويز): مراجعة سريعة، بيطلّعلك لوحده أهم نقاط المحاضرة مترتبة بالأهمية (★ الأهم الأول)، من غير ما تكتب حاجة. زرار «الأهم بس» يعرضلك أهم النقاط بس، ولو دوست «عرض الكل» تشوف الباقي والمصطلحات الأساسية."},
@@ -1021,5 +1041,6 @@ if(!S.tourDone){setTimeout(tourStart,700)}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!planEdit&&(cur==="plan"||!cur))render()});
 if("serviceWorker" in navigator&&location.protocol==="https:"){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 </script>
+<script src="figs.js" defer></script>
 </body>
 </html>
