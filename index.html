@@ -742,7 +742,8 @@ function planState(){
   save();
  }
  // migration (no reset): start date, auto-built Friday reviews
- if(!S.planStart){const t=new Date();const add=(6-t.getDay()+7)%7;const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()+add);S.planStart=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");save()}
+ if(!S.planStartFix){S.planStartFix=1;if(S.planStart==="2026-11-28")S.planStart="2026-11-21";save()}
+ if(!S.planStart){const t=new Date();const add=-((t.getDay()+1)%7);const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()+add);S.planStart=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");save()}
  for(let w=1;w<=PLAN_WEEKS;w++){(S.plan[w][5]||[]).forEach(it=>{if(it.s==="rev"&&!it.lecs&&!it.custom&&typeof it.label==="string"&&it.label.indexOf("مراجعة الأسبوع")===0&&!it.auto)it.auto=true})}
  return S.plan;
 }
