@@ -1,7 +1,7 @@
 {
   "name": "Jino Study",
   "short_name": "Jino Study",
-  "description": "Offline study app: CT and Radiobiology lectures with flashcards, quizzes and a study plan.",
+  "description": "Offline study app: CT, Radiobiology, Nuclear Medicine, Photography and Technique lectures with flashcards, quizzes and a study plan.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
