@@ -174,6 +174,7 @@ header p{margin:4px 0 0;opacity:.85;font-size:13px}
 .note .nn{display:inline-block;background:#4f46e5;color:#fff;border-radius:9px;font-size:11px;font-weight:800;padding:1px 7px;margin-right:6px}
 .note .ntag{display:inline-block;font-size:10.5px;color:#92400e;background:#fef3c7;border-radius:8px;padding:1px 7px;margin-top:6px}
 .nterm{padding:7px 2px;border-bottom:1px solid #e5e7eb;font-size:13.5px}.nterm b{color:#3730a3}.nterm .ar{display:block;direction:rtl;text-align:right;color:#57534e;font-size:12.5px}
+.sess.late{border-color:#fca5a5;background:#fef2f2}.sess .ltag{display:inline-block;background:#dc2626;color:#fff;border-radius:8px;font-size:10.5px;font-weight:800;padding:1px 7px;margin-right:6px}.sess .lnote{display:block;color:#b91c1c;font-size:11px}
 </style>
 </head>
 <body>
@@ -781,26 +782,54 @@ function planStats(){
  for(const w of Object.values(p))for(const d of Object.values(w))for(const s of d){total++;if(s.done)done++}
  const di=dateInfo();
  const wk=di.week;
- const today=(di.state==="in"&&p[wk]&&p[wk][di.jsd])?p[wk][di.jsd].filter(s=>!s.done).length:0;
+ let today=(di.state==="in"&&p[wk]&&p[wk][di.jsd])?p[wk][di.jsd].filter(s=>!s.done).length:0;
+ if(di.state==="in"){const L=lateInfo().at[wk+"|"+di.jsd];if(L)today+=L.length}
  return {done,total,pct:pct(done,total),week:wk,today,state:di.state,start:planStartDate()};
 }
 function goPlan(){cur="plan";planWeek=planStats().week;planFormDay=null;planEdit=null;render();window.scrollTo(0,0)}
 window.goPlan=goPlan;
 function setWeek(w){planWeek=w;planFormDay=null;planEdit=null;render()}
 window.setWeek=setWeek;
+
+/* ---------- late lectures carry over (computed live, plan data untouched) ---------- */
+function lateInfo(){
+ const p=planState(),di=dateInfo(),at={},from={};
+ if(di.state==="before")return {at:at,from:from};
+ const curW=di.state==="after"?PLAN_WEEKS+1:di.week;
+ const todayI=di.state==="after"?9999:(di.days%7);
+ const slots=[];
+ for(let w=1;w<=PLAN_WEEKS;w++)DAYS.forEach(([jd],o)=>{if(jd!==5)slots.push({w:w,jd:jd,o:o,idx:(w-1)*7+o})});
+ const nowIdx=di.state==="after"?9999:di.days;
+ for(let w0=1;w0<curW&&w0<=PLAN_WEEKS;w0++){
+  DAYS.forEach(([jd0])=>{(p[w0][jd0]||[]).forEach((it,i)=>{
+   if(it.s==="rev"||it.done)return;
+   const rest=slots.filter(x=>x.w>w0&&x.idx>=nowIdx);
+   let tg=rest.find(x=>(p[x.w][x.jd]||[]).some(y=>y.s===it.s));
+   if(!tg)tg=rest[0];
+   if(!tg)tg=slots[slots.length-1];
+   const k=tg.w+"|"+tg.jd;
+   (at[k]=at[k]||[]).push({w:w0,jd:jd0,i:i,it:it});
+   from[w0+"|"+jd0+"|"+i]=tg;
+  })});
+ }
+ return {at:at,from:from};
+}
+function planToggleLate(w,jsd,i){const p=planState();p[w][jsd][i].done=!p[w][jsd][i].done;save();render()}
+window.planToggleLate=planToggleLate;
 function planView(){
  const p=planState();
  const di=dateInfo();
  const stats=planStats();
  const jsDay=di.jsd;
  let h=`<div class="card"><h3 style="margin-top:0">جدول المذاكرة · Study plan</h3>
-  <p class="small" dir="rtl" style="margin-top:0;text-align:right">خطة مقترحة لكل المواد الخمسة: حوالي 10 محاضرات في الأسبوع من السبت للخميس (بتتوزع على المواد مع بعض)، والجمعة مراجعة الأسبوع. عدّلها زي ما يناسبك: زرار «تعديل اليوم» تحت كل يوم تغيّر بيه عدد المحاضرات وتختار أنهي محاضرات، ومراجعة الجمعة بتتبني من المحاضرات اللي علّمت عليها «تم» (وتقدر تعدّلها). الأسبوع 1 بيبدأ يوم السبت ${fmtD(planStartDate())}، وعلامة «اليوم» بتتحرك لوحدها حسب تاريخ النهارده.</p>
+  <p class="small" dir="rtl" style="margin-top:0;text-align:right">خطة مقترحة لكل المواد الخمسة: حوالي 10 محاضرات في الأسبوع من السبت للخميس (بتتوزع على المواد مع بعض)، والجمعة مراجعة الأسبوع. عدّلها زي ما يناسبك: زرار «تعديل اليوم» تحت كل يوم تغيّر بيه عدد المحاضرات وتختار أنهي محاضرات، ومراجعة الجمعة بتتبني من المحاضرات اللي علّمت عليها «تم» (وتقدر تعدّلها). الأسبوع 1 بيبدأ يوم السبت ${fmtD(planStartDate())}، وعلامة «اليوم» بتتحرك لوحدها حسب تاريخ النهارده. والمحاضرة اللي الأسبوع يخلص وانت لسه مذاكرتهاش بتظهر في الأسبوع اللي بعده جنب محاضرة نفس المادة وعليها علامة «متأخرة» لحد ما تعلّمها «تم».</p>
   <div class="bar" style="margin:8px 0"><div style="width:${stats.pct}%"></div></div>
   <div class="pct">${stats.done}/${stats.total} sessions done</div></div>
   <div class="card" style="padding:12px"><div class="weekrow">`;
  for(let w=1;w<=PLAN_WEEKS;w++)h+=`<button class="${w===planWeek?'on':''}" onclick="setWeek(${w})">أسبوع ${w}</button>`;
  h+=`</div>`;
  const wp=p[planWeek];
+ const LI=lateInfo();
  for(const [jsd,arName,enName] of DAYS){
   const list=wp[jsd]||[];
   const isToday=(di.state==="in"&&planWeek===di.week&&jsd===jsDay);
@@ -811,12 +840,19 @@ function planView(){
     <select id="pf-lec"></select>
     <button class="btn" style="margin-top:6px;padding:10px" onclick="planAdd(${jsd})">أضف لليوم ده</button></div>`;
   }
-  if(!list.length)h+=`<div class="small" style="margin:8px 0">مفيش جلسات - راحة 😌</div>`;
+  const lateL=LI.at[planWeek+"|"+jsd]||[];
+  lateL.forEach(x=>{
+   const s=x.it,lid=s.s+(s.l+1),inApp=!!DATA[lid];
+   h+=`<div class="sess late"><div class="dot" style="background:#dc2626"></div><div class="si"><span class="ltag">متأخرة</span>${SUBJECTS[s.s].name} - Lec ${s.l+1}: ${LECTURES[s.s][s.l]}<small>من أسبوع ${x.w} · ${DAYS.find(d=>d[0]===x.jd)[1]}</small></div>
+    ${inApp?`<button class="chk" style="background:var(--grad);color:#fff;border:0" onclick="goLec('${lid}')">افتح</button>`:''}
+    <button class="chk" onclick="planToggleLate(${x.w},${x.jd},${x.i})">تم</button></div>`;
+  });
+  if(!list.length&&!lateL.length)h+=`<div class="small" style="margin:8px 0">مفيش جلسات - راحة 😌</div>`;
   list.forEach((s,i)=>{
    const label=s.s==="rev"?revLabel(planWeek,s):(SUBJECTS[s.s].name+" - Lec "+(s.l+1)+": "+LECTURES[s.s][s.l]);
    const lid=s.s+(s.l+1);
    const inApp=(s.s!=="rev"&&DATA[lid]);
-   h+=`<div class="sess ${s.done?'done':''}"><div class="dot"></div><div class="si">${label}<small>${s.s==="rev"?"مراجعة أسبوعية":(inApp?"موجودة في التطبيق ✅":"")}</small></div>
+   h+=`<div class="sess ${s.done?'done':''}"><div class="dot"></div><div class="si">${label}<small>${s.s==="rev"?"مراجعة أسبوعية":(inApp?"موجودة في التطبيق ✅":"")}</small>${(LI.from[planWeek+"|"+jsd+"|"+i]&&!s.done)?`<small class="lnote">متأخرة ← ظاهرة في أسبوع ${LI.from[planWeek+"|"+jsd+"|"+i].w} يوم ${DAYS.find(d=>d[0]===LI.from[planWeek+"|"+jsd+"|"+i].jd)[1]}</small>`:""}</div>
     ${inApp?`<button class="chk" style="background:var(--grad);color:#fff;border:0" onclick="goLec('${lid}')">افتح</button>`:''}
     <button class="chk" onclick="planToggle(${jsd},${i})">${s.done?'✓':'تم'}</button>
     <button class="del" onclick="planDel(${jsd},${i})">حذف</button></div>`;
@@ -907,6 +943,7 @@ const TOUR=[
  {go:["ct1","recall"],sel:".card",text:"التسميع: جاوب من دماغك الأول، وبعدين اعرض الإجابة النموذجية وقارن وقيّم نفسك."},
  {go:["ct1","prog"],sel:".card",text:"صفحة التقدم: نسبتك في كل جزء من المحاضرة دي، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
  {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة لكل المواد الخمسة (حوالي 10 محاضرات في الأسبوع من السبت للخميس والجمعة مراجعة)، علامة «اليوم» بتتحرك لوحدها حسب التاريخ، وتقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. والمحاضرات الموجودة في التطبيق ليها زرار (افتح) يوديك عليها على طول."},
+ {go:"plan",sel:".sess.late",text:"المحاضرات المتأخرة: لو أسبوع خلص وفي محاضرة مش متعلّم عليها «تم»، بتظهر الأسبوع اللي بعده في نفس يوم محاضرة نفس المادة، بعلامة حمرا «متأخرة» ومكتوب منين جت. علّمها «تم» وتختفي. ولو المادة مفيهاش محاضرات تانية، بتظهر في أقرب يوم باقي."},
  {go:"plan",sel:".editday",text:"زرار «تعديل اليوم»: غيّر عدد محاضرات اليوم ده وإختار أنهي محاضرات بالظبط. وفي يوم الجمعة، المراجعة بتتبني من المحاضرات اللي علّمت عليها «تم» الأسبوع ده، وتقدر تعدّلها بإيدك."},
  {go:"home",sel:null,text:"خلصت الجولة! تقدر تعيدها في أي وقت من زرار (؟ جولة) فوق. بالتوفيق في المذاكرة يا جينو 💪"},
 ];
