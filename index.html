@@ -163,6 +163,17 @@ header p{margin:4px 0 0;opacity:.85;font-size:13px}
 #tourcard .next{background:var(--grad);color:#fff}
 #tourcard .skip{background:#f3f4f6;color:var(--muted)}
 #tourcard .tcount{font-size:11px;color:var(--muted);text-align:center;margin-top:8px}
+
+.nhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.nhead .btn{display:inline-block;width:auto;flex:none;white-space:nowrap;padding:8px 14px;font-size:12.5px}
+.ntier{font-weight:800;font-size:13px;margin:14px 2px 6px;color:#3730a3}
+.note{background:#fff;border-radius:12px;padding:10px 12px;margin:0 0 8px;box-shadow:0 1px 4px rgba(79,70,229,.12);border-left:5px solid #a5b4fc}
+.note.t1{border-left-color:#f59e0b;background:#fffbeb}.note.t2{border-left-color:#6366f1}
+.note .nq{font-weight:800;color:#1e1b4b;font-size:14px;margin-bottom:4px}
+.note .na{color:#374151;font-size:13.5px;line-height:1.5}
+.note .nn{display:inline-block;background:#4f46e5;color:#fff;border-radius:9px;font-size:11px;font-weight:800;padding:1px 7px;margin-right:6px}
+.note .ntag{display:inline-block;font-size:10.5px;color:#92400e;background:#fef3c7;border-radius:8px;padding:1px 7px;margin-top:6px}
+.nterm{padding:7px 2px;border-bottom:1px solid #e5e7eb;font-size:13.5px}.nterm b{color:#3730a3}.nterm .ar{display:block;direction:rtl;text-align:right;color:#57534e;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -276,7 +287,7 @@ function picker(subj){
 }
 
 function tabsHtml(sid){
- const t=[["learn","Learn"],["cards","Cards"],["quiz","Quiz"],["recall","Recall"],["prog","Progress"]];
+ const t=[["learn","Learn"],["cards","Cards"],["notes","Notes"],["quiz","Quiz"],["recall","Recall"],["prog","Progress"]];
  return `<div class="tabs">`+t.map(([k,l])=>`<button class="${tab===k?'on':''}" onclick="setTab('${k}')">${l}</button>`).join("")+`</div>`;
 }
 
@@ -435,6 +446,61 @@ function recallAns(sid,ok){ const s=st(sid);const dk=getRdeck(sid); s.recall[dk[
 window.recallAns=recallAns;
 function restartRecall(){ri=0;rshown=false;rdeck=null;render()}
 window.restartRecall=restartRecall;
+
+
+/* ---------- notes (auto key points, ranked) ---------- */
+let notesTop=false;
+const N_STOP=new Set("that this with from have which their there these those about into than then them they were been being also each such when what where while will would could should only more most some other over under between within through using used uses used called name list give state main know mean means does doesn have has are for and the not can may per its it's his her our out all any one two three first second".split(" "));
+function nToks(s){return Array.from(new Set((String(s||"").replace(/<[^>]*>/g," ").toLowerCase().match(/[a-z][a-z-]{3,}/g)||[]).filter(w=>!N_STOP.has(w))))}
+const NCACHE={};
+function noteData(sid){
+ if(NCACHE[sid])return NCACHE[sid];
+ const d=DATA[sid];
+ const units=[];
+ d.sections.forEach(sc=>{units.push(nToks(sc.blocks.map(b=>b.en).join(" ")))});
+ const tested=[];
+ d.quiz.forEach(q=>{tested.push(nToks(q.q+" "+(q.o&&q.o[q.a]!=null?q.o[q.a]:"")))});
+ d.recall.forEach(q=>{tested.push(nToks(q.q+" "+q.a))});
+ const df={};units.concat(tested).forEach(u=>u.forEach(w=>{df[w]=(df[w]||0)+1}));
+ const cards=d.flash.map((c,i)=>{
+  const tk=nToks(c.f+" "+c.b);
+  let sc=0;tk.forEach(w=>{sc+=Math.log(1+(df[w]||0))});
+  sc=sc/Math.sqrt(Math.max(4,tk.length))*3;
+  let hits=0;
+  tested.forEach(u=>{let m=0;for(const w of tk){if(u.indexOf(w)>=0)m++;if(m>=3)break}if(m>=3)hits++});
+  return {i:i,f:c.f,b:c.b,score:sc+Math.min(hits,6)*1.5,hits:hits};
+ });
+ cards.sort((a,b)=>b.score-a.score||a.i-b.i);
+ const n=cards.length,c1=Math.max(1,Math.round(n*0.34)),c2=Math.max(c1+1,Math.round(n*0.7));
+ cards.forEach((c,r)=>{c.tier=r<c1?1:(r<c2?2:3)});
+ const terms=[];
+ d.sections.forEach(sc=>(sc.terms||[]).forEach(tm=>{
+  const w=nToks(tm[0]).concat(nToks(tm[1]).slice(0,2));let s=0;w.forEach(x=>{s+=(df[x]||0)});
+  terms.push({t:tm[0],e:tm[1],a:tm[2],s:s/Math.max(1,w.length)});
+ }));
+ terms.sort((a,b)=>b.s-a.s);
+ return NCACHE[sid]={cards:cards,terms:terms.slice(0,8)};
+}
+function notes(sid){
+ const nd=noteData(sid);
+ const tiers=[[1,"★ الأهم · Must know"],[2,"مهم · Important"],[3,"تفاصيل · Extra"]];
+ let h=`<div class="card"><div class="nhead"><div dir="rtl" style="text-align:right"><b>Notes · نقاط المحاضرة</b><div class="small">نقاط مجمّعة تلقائياً من المحاضرة ومترتبة حسب الأهمية (الأكتر ظهوراً في الشرح والكويز والتسميع فوق).</div></div><button class="btn ghost" onclick="toggleNotesTop()">${notesTop?"عرض الكل":"الأهم بس"}</button></div></div><div class="nlist">`;
+ let k=0;
+ for(const [tr,lab] of tiers){
+  if(notesTop&&tr>1)break;
+  const L=nd.cards.filter(c=>c.tier===tr);
+  if(!L.length)continue;
+  h+=`<div class="ntier">${lab}</div>`;
+  L.forEach(c=>{k++;h+=`<div class="note t${tr}"><div class="nq"><span class="nn">${k}</span>${c.f}</div><div class="na">${c.b}</div>${c.hits?`<span class="ntag">بيظهر في الكويز/التسميع × ${c.hits}</span>`:""}</div>`});
+ }
+ h+=`</div>`;
+ if(!notesTop&&nd.terms.length){
+  h+=`<div class="card"><div class="ntier" style="margin-top:0">مصطلحات أساسية · Key terms</div>`+nd.terms.map(x=>`<div class="nterm"><b>${x.t}</b> - ${x.e}<span class="ar">${x.a||""}</span></div>`).join("")+`</div>`;
+ }
+ return h;
+}
+function toggleNotesTop(){notesTop=!notesTop;render()}
+window.toggleNotesTop=toggleNotesTop;
 
 /* ---------- progress ---------- */
 function prog(sid){
@@ -826,9 +892,9 @@ window.planDel=planDel;
 /* ---------- guided tour ---------- */
 const TOUR=[
  {go:null,sel:null,text:"أهلاً بيك في Jino Study! دي جولة سريعة على كل المميزات. دقيقة واحدة بس."},
- {go:"home",sel:".subj",text:"كل بطاقة مادة فيها محاضرات كاملة: شرح وكروت وكويز وتسميع وتقدم. دوس على المادة تفتح قائمة المحاضرات."},
+ {go:"home",sel:".subj",text:"كل بطاقة مادة فيها محاضرات كاملة: شرح وكروت وكويز وتسميع ونوتس وتقدم. دوس على المادة تفتح قائمة المحاضرات."},
  {go:"subj:ct",sel:".subj",text:"صفحة المحاضرات: كل محاضرة متضافة بتظهر بنسبة تقدمها ومحتواها. دوس على المحاضرة تفتحها."},
- {go:["ct1","learn"],sel:".tabs",text:"التبويبات الخمسة جوه كل محاضرة: Learn للشرح، Cards للحفظ، Quiz للاختبار، Recall للتسميع، Progress لمتابعة مستواك."},
+ {go:["ct1","learn"],sel:".tabs",text:"التبويبات الستة جوه كل محاضرة: Learn للشرح، Cards للحفظ، Notes لمراجعة سريعة قبل الكويز، Quiz للاختبار، Recall للتسميع، Progress لمتابعة مستواك."},
  {go:["ct1","learn"],sel:".langbtn",text:"سويتش اللغة: حرّكه لناحية ع يظهر الترجمة العربية تحت كل فقرة إنجليزي في السكشن ده بس، وارجعه EN يرجع إنجليزي بس."},
  {go:["ct1","learn"],sel:".sec .blk p",text:"دوس على أي كلمة إنجليزية في الشرح تطلعلك ترجمتها العلمية بالعربي ومعناها ونطقها. ولو حددت جملة، تظهر ترجمة الفقرة كلها. الكلمات اللي مش في القاموس هتقولك بصراحة إن مفيش ترجمة."},
  {go:["ct1","learn"],sel:".chip",text:"المصطلحات المهمة آخر كل سكشن: دوس على المصطلح يظهر تعريفه إنجليزي وعربي."},
@@ -836,6 +902,7 @@ const TOUR=[
  {go:["ct1","learn"],sel:".svgfig",text:"الرسومات التوضيحية (2D) كمان: دوس على الرسمة أو زرار «⤢ تكبير» تفتح على الشاشة كلها بحجم كبير، حرّكها بإصبعك وكبّرها بزراري + و −."},
  {go:["ct1","learn"],sel:".readbtn",text:"لما تخلص سكشن، علّمه كمقروء عشان يتحسب في تقدمك."},
  {go:["ct1","cards"],sel:".flash",text:"كروت الحفظ: دوس على الكارت يتقلب، وبعدين قيّم نفسك بصراحة: عرفتها ولا مش عرفتها."},
+ {go:["ct1","notes"],sel:".nlist",text:"تبويب Notes (قبل الكويز): مراجعة سريعة، بيطلّعلك لوحده أهم نقاط المحاضرة مترتبة بالأهمية (★ الأهم الأول)، من غير ما تكتب حاجة. زرار «الأهم بس» يعرضلك أهم النقاط بس، ولو دوست «عرض الكل» تشوف الباقي والمصطلحات الأساسية."},
  {go:["ct1","quiz"],sel:".card",text:"الكويز: اختر إجابة وشوف التصحيح والشرح بالعربي فوراً. درجتك بتتسجل وأفضل نتيجة بتتحفظ لكل محاضرة لوحدها."},
  {go:["ct1","recall"],sel:".card",text:"التسميع: جاوب من دماغك الأول، وبعدين اعرض الإجابة النموذجية وقارن وقيّم نفسك."},
  {go:["ct1","prog"],sel:".card",text:"صفحة التقدم: نسبتك في كل جزء من المحاضرة دي، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
@@ -895,6 +962,7 @@ function render(){
  else if(tab==="cards")body=cards(cur);
  else if(tab==="quiz")body=quiz(cur);
  else if(tab==="recall")body=recall(cur);
+ else if(tab==="notes")body=notes(cur);
  else body=prog(cur);
  app.innerHTML=tabsHtml(cur)+body;
  initViewers();
