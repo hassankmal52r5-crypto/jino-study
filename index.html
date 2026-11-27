@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Jino Study">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<link rel="icon" href="icon-192.svg" type="image/svg+xml">
 <style>
 :root{
  --bg:#eef0fb; --card:#ffffff; --ink:#1e1b4b; --muted:#6b7280;
@@ -569,14 +569,14 @@ function home(){
   const d=SUBJECTS[subj], p=subjProgress(subj);
   const nB=builtLecs(subj).length, nT=d.titles.length;
   h+=`<button class="card subj" onclick="goSubj('${subj}')">
-    <h2>${d.name}</h2><div class="lec">${nB} of ${nT} lectures in the app · الباقي بيتحضّر</div>
+    <h2>${d.name}</h2><div class="lec">${nB===nT?nT+" lectures":nB+" of "+nT+" lectures in the app"}</div>
     <div class="bar"><div style="width:${p}%"></div></div>
     <div class="pct">${p}% complete</div>
   </button>`;
  }
  const pl=planStats();
  h+=`<button class="card subj" onclick="goPlan()">
-   <h2>Study plan - جدول المذاكرة</h2><div class="lec">${pl.today>0?pl.today+" sessions today":'No sessions today'} · week ${pl.week} of ${PLAN_WEEKS}</div>
+   <h2>Study plan - جدول المذاكرة</h2><div class="lec">${pl.today>0?pl.today+(pl.today===1?" session today":" sessions today"):'No sessions today'} · week ${pl.week} of ${PLAN_WEEKS}</div>
    <div class="bar"><div style="width:${pl.pct}%"></div></div>
    <div class="pct">${pl.done}/${pl.total} sessions done (${pl.pct}%)</div>
  </button>`;
@@ -600,7 +600,7 @@ function picker(subj){
   }else{
    h+=`<div class="card subj" style="opacity:.55;cursor:default">
      <h2>Lecture ${i+1}</h2><div class="lec">${t}</div>
-     <div class="pct">لسه بيتحضّر · not in the app yet</div>
+     <div class="pct">not in the app yet</div>
    </div>`;
   }
  });
@@ -973,7 +973,7 @@ function planView(){
  const jsDay=new Date().getDay();
  const stats=planStats();
  let h=`<div class="card"><h3 style="margin-top:0">جدول المذاكرة · Study plan</h3>
-  <p class="small" style="margin-top:0">خطة مقترحة: محاضرتين CT ومحاضرتين راديوبايولوجي في الأسبوع، والجمعة مراجعة. عدّلها زي ما يناسبك.</p>
+  <p class="small" style="margin-top:0">خطة مقترحة جاهزة لمادتين: محاضرتين CT ومحاضرتين راديوبايولوجي في الأسبوع، والجمعة مراجعة. باقي المواد ضيفها بزرار + إضافة. عدّلها زي ما يناسبك.</p>
   <div class="bar" style="margin:8px 0"><div style="width:${stats.pct}%"></div></div>
   <div class="pct">${stats.done}/${stats.total} sessions done</div></div>
   <div class="card" style="padding:12px"><div class="weekrow">`;
@@ -994,7 +994,7 @@ function planView(){
    const label=s.s==="rev"?(s.label||"مراجعة"):(SUBJECTS[s.s].name+" - Lec "+(s.l+1)+": "+LECTURES[s.s][s.l]);
    const lid=s.s+(s.l+1);
    const inApp=(s.s!=="rev"&&DATA[lid]);
-   h+=`<div class="sess ${s.done?'done':''}"><div class="dot"></div><div class="si">${label}<small>${s.s==="rev"?"مراجعة أسبوعية":(inApp?"موجودة في التطبيق ✅":"قريباً في التطبيق")}</small></div>
+   h+=`<div class="sess ${s.done?'done':''}"><div class="dot"></div><div class="si">${label}<small>${s.s==="rev"?"مراجعة أسبوعية":(inApp?"موجودة في التطبيق ✅":"")}</small></div>
     ${inApp?`<button class="chk" style="background:var(--grad);color:#fff;border:0" onclick="goLec('${lid}')">افتح</button>`:''}
     <button class="chk" onclick="planToggle(${jsd},${i})">${s.done?'✓':'تم'}</button>
     <button class="del" onclick="planDel(${jsd},${i})">حذف</button></div>`;
@@ -1032,7 +1032,7 @@ window.planDel=planDel;
 const TOUR=[
  {go:null,sel:null,text:"أهلاً بيك في Jino Study! دي جولة سريعة على كل المميزات. دقيقة واحدة بس."},
  {go:"home",sel:".subj",text:"كل بطاقة مادة فيها محاضرات كاملة: شرح وكروت وكويز وتسميع وتقدم. دوس على المادة تفتح قائمة المحاضرات."},
- {go:"subj:ct",sel:".subj",text:"صفحة المحاضرات: كل محاضرة متضافة بتظهر بنسبة تقدمها ومحتواها. اللي لسه بيتحضّر بتبان رمادي. دوس على المحاضرة تفتحها."},
+ {go:"subj:ct",sel:".subj",text:"صفحة المحاضرات: كل محاضرة متضافة بتظهر بنسبة تقدمها ومحتواها. دوس على المحاضرة تفتحها."},
  {go:["ct1","learn"],sel:".tabs",text:"التبويبات الخمسة جوه كل محاضرة: Learn للشرح، Cards للحفظ، Quiz للاختبار، Recall للتسميع، Progress لمتابعة مستواك."},
  {go:["ct1","learn"],sel:".langbtn",text:"سويتش اللغة: حرّكه لناحية ع يظهر الترجمة العربية تحت كل فقرة إنجليزي في السكشن ده بس، وارجعه EN يرجع إنجليزي بس."},
  {go:["ct1","learn"],sel:".sec .blk p",text:"دوس على أي كلمة إنجليزية في الشرح تطلعلك ترجمتها العلمية بالعربي ومعناها ونطقها. ولو حددت جملة، تظهر ترجمة الفقرة كلها. الكلمات اللي مش في القاموس هتقولك بصراحة إن مفيش ترجمة."},
@@ -1043,7 +1043,7 @@ const TOUR=[
  {go:["ct1","quiz"],sel:".card",text:"الكويز: اختر إجابة وشوف التصحيح والشرح بالعربي فوراً. درجتك بتتسجل وأفضل نتيجة بتتحفظ لكل محاضرة لوحدها."},
  {go:["ct1","recall"],sel:".card",text:"التسميع: جاوب من دماغك الأول، وبعدين اعرض الإجابة النموذجية وقارن وقيّم نفسك."},
  {go:["ct1","prog"],sel:".card",text:"صفحة التقدم: نسبتك في كل جزء من المحاضرة دي، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
- {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة (محاضرتين من كل مادة في الأسبوع والجمعة مراجعة)، تقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. والمحاضرات الموجودة في التطبيق ليها زرار (افتح) يوديك عليها على طول."},
+ {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة لـ CT وراديوبايولوجي (محاضرتين من كل واحدة في الأسبوع والجمعة مراجعة)، وباقي المواد تضيفها بزرار (+ إضافة)، تقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. والمحاضرات الموجودة في التطبيق ليها زرار (افتح) يوديك عليها على طول."},
  {go:"home",sel:null,text:"خلصت الجولة! تقدر تعيدها في أي وقت من زرار (؟ جولة) فوق. بالتوفيق في المذاكرة يا جينو 💪"},
 ];
 let tourI=0;
