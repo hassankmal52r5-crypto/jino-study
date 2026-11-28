@@ -216,19 +216,17 @@ const $=s=>document.querySelector(s);
 const hdr=$("#hdr"), app=$("#app");
 function pct(n,d){return d?Math.round(n/d*100):0}
 
-function secPct(lid){const d=DATA[lid],s=st(lid);const ids=d.sections.map(x=>x.id);return pct(s.read.filter(x=>ids.includes(x)).length,ids.length)}
 function lecProgress(lid){
  const d=DATA[lid], s=st(lid);
  const fl=Object.keys(s.flash).filter(k=>s.flash[k]).length, rc=Object.keys(s.recall).filter(k=>s.recall[k]).length;
- const nw=Math.round(secPct(lid)*0.4+pct(fl,d.flash.length)*0.2+(s.quizAtt?s.quizBest:0)*0.2+pct(rc,d.recall.length)*0.2);
+ const nw=Math.round((pct(fl,d.flash.length)+(s.quizAtt?s.quizBest:0)+pct(rc,d.recall.length))/3);
  let fl0=0;
  if(d.legacy){ /* old 4-part formula on the original items: saved progress never goes down */
   const L=d.legacy;
-  const a=pct(s.read.filter(x=>L.sec.includes(x)).length,L.sec.length);
   const b=pct(Object.keys(s.flash).filter(k=>s.flash[k]&&+k<L.flash).length,L.flash);
   const c=s.quizAtt?s.quizBest:0;
   const e=pct(Object.keys(s.recall).filter(k=>s.recall[k]&&+k<L.recall).length,L.recall);
-  fl0=Math.round((a+b+c+e)/4);
+  fl0=Math.round((b+c+e)/3);
  }
  return Math.max(nw,fl0);
 }
@@ -283,7 +281,7 @@ function picker(subj){
    h+=`<button class="card subj" onclick="goLec('${lid}')">
      <h2>Lecture ${i+1}</h2><div class="lec">${t}</div>
      <div class="bar"><div style="width:${p}%"></div></div>
-     <div class="pct">${p}% complete - ${dd.slides?dd.slides+" slides · ":""}sections ${st(lid).read.filter(x=>dd.sections.some(z=>z.id===x)).length}/${dd.sections.length} · ${dd.flash.length} cards · ${dd.quiz.length} quiz Qs · ${dd.recall.length} recall Qs</div>
+     <div class="pct">${p}% complete - ${dd.slides?dd.slides+" slides · ":""}${dd.flash.length} cards · ${dd.quiz.length} quiz Qs · ${dd.recall.length} recall Qs</div>
    </button>`;
   }else{
    h+=`<div class="card subj" style="opacity:.55;cursor:default">
@@ -319,13 +317,6 @@ window.toggleLang=toggleLang;
 function toggleTerm(el){ const n=el.nextElementSibling; n.style.display=n.style.display==="block"?"none":"block"; }
 window.toggleTerm=toggleTerm;
 
-function markRead(sid,id){
- const s=st(sid); const i=s.read.indexOf(id);
- if(i<0)s.read.push(id);else s.read.splice(i,1);
- save();render();
-}
-window.markRead=markRead;
-
 function picsFor(sid,i){
  const ps=PICS[sid]||[],n=DATA[sid].sections.length;let h="";
  ps.forEach((p,j)=>{if(Math.min(n-1,Math.floor((j+0.5)*n/ps.length))===i)h+=`<div class="pic" onclick="openPic('${p[0]}')"><button class="vexp" type="button">⤢ تكبير</button><img alt="slide ${p[1]}" data-f="${p[0]}"><div class="figcap">صورة من سلايدات المحاضرة · slide ${p[1]} · اضغط للتكبير</div></div>`});
@@ -346,7 +337,6 @@ function learn(sid){
  const d=DATA[sid], s=st(sid);
  let h="";let secIdx=0;
  for(const sec of d.sections){
-  const done=s.read.includes(sec.id);
   const arOn=!!S.lang[sec.id];
   h+=`<div class="card sec ${arOn?'show-ar':''}" data-sec="${sec.id}">
    <div class="sechead"><h3>${sec.title_en}</h3><button class="langbtn ${arOn?'on':''}" role="switch" aria-checked="${arOn?'true':'false'}" aria-label="Arabic translation" onclick="toggleLang(this,'${sec.id}')"><span class="knob">${arOn?'ع':'EN'}</span></button></div>
@@ -359,7 +349,7 @@ function learn(sid){
   if(sec.terms&&sec.terms.length){
    h+=`<div class="chips">`+sec.terms.map(t=>`<button class="chip" onclick="toggleTerm(this)">${t[0]}</button><div class="termdef" style="display:none">${t[1]}<span class="ar">${t[2]||""}</span></div>`).join("")+`</div>`;
   }
-  h+=`<button class="readbtn ${done?'done':''}" onclick="markRead('${sid}','${sec.id}')">${done?'✓ Read':'Mark as read'}</button></div>`;
+  h+=`</div>`;
  }
  return h;
 }
@@ -533,20 +523,16 @@ function prog(sid){
  const d=DATA[sid], s=st(sid);
  const fm=Object.keys(s.flash).filter(k=>s.flash[k]).length;
  const rd=Object.keys(s.recall).filter(k=>s.recall[k]).length;
- const nread=s.read.filter(x=>d.sections.some(z=>z.id===x)).length;
- const rows=[["Sections read", nread, d.sections.length],["Cards mastered", fm, d.flash.length],["Recall answered right", rd, d.recall.length]];
+ const rows=[["Cards mastered", fm, d.flash.length],["Recall answered right", rd, d.recall.length]];
  let h=`<div class="card"><h3 style="margin-top:0">Your progress</h3>`;
  for(const [l,n,m] of rows){
   h+=`<div class="prow"><div class="lbl">${l}</div><div class="bar"><div style="width:${pct(n,m)}%"></div></div><div class="val">${n}/${m}</div></div>`;
  }
- h+=`<div class="seclist"><h4 style="margin:14px 0 6px">Sections - tap to mark read</h4>`+d.sections.map((x,i)=>{const ok=s.read.includes(x.id);return `<div class="prow" style="align-items:center"><button class="btn ghost" style="flex:0 0 36px;padding:6px 0;margin:0" onclick="markRead('${sid}','${x.id}')">${ok?"✓":"○"}</button><div class="lbl" style="flex:1;cursor:pointer;margin-left:8px" onclick="goSec('${sid}','${x.id}')">${i+1}. ${x.title_en}</div></div>`}).join("")+`</div>`;
  h+=`<div class="prow"><div class="lbl">Quiz best</div><div class="bar"><div style="width:${s.quizBest}%"></div></div><div class="val">${s.quizBest}%</div></div>`;
  h+=`<div class="stat-grid"><div class="s"><b>${s.quizAtt}</b><span>quiz attempts</span></div><div class="s"><b>${lecProgress(sid)}%</b><span>overall</span></div></div>`;
  h+=`<button class="btn ghost" onclick="resetProg('${sid}')">Reset progress for this lecture</button></div>`;
  return h;
 }
-function goSec(sid,secid){goLec(sid,"learn");setTimeout(()=>{const e=document.querySelector('[data-sec="'+secid+'"]');if(e)e.scrollIntoView({block:"start"})},60)}
-window.goSec=goSec;
 function resetProg(sid){ if(confirm("Reset all progress for this lecture?")){S[sid]={read:[],flash:{},quizBest:0,quizAtt:0,recall:{}};save();render()} }
 window.resetProg=resetProg;
 
@@ -986,13 +972,11 @@ const TOUR=[
  {go:["ct1","learn"],sel:".svgfig",text:"الرسومات دي 2D مسطّحة بتشرح الخلية والأنسجة والمخ والجانتري. الأرقام الصفرا على الرسمة بتفسرها القايمة تحتها."},
  {go:["ct1","learn"],sel:".svgfig",text:"الرسومات التوضيحية (2D) كمان: دوس على الرسمة أو زرار «⤢ تكبير» تفتح على الشاشة كلها بحجم كبير، حرّكها بإصبعك وكبّرها بزراري + و −."},
  {go:["ct1","learn"],sel:".pic",text:"صور من سلايدات المحاضرة: أشعة وصور أجهزة ورسومات حقيقية من السلايدات نفسها وسط السكاشن (مش كل محاضرة فيها صور). دوس على الصورة تفتح بالحجم الكبير، حرّكها بإصبعك وكبّرها بزراري + و −."},
- {go:["ct1","learn"],sel:".readbtn",text:"لما تخلص سكشن، علّمه كمقروء: نسبة المحاضرة بتزيد سكشن بسكشن."},
  {go:["ct1","cards"],sel:".flash",text:"كروت الحفظ: دوس على الكارت يتقلب، وبعدين قيّم نفسك بصراحة: عرفتها ولا مش عرفتها."},
  {go:["ct1","notes"],sel:".nlist",text:"تبويب Notes (قبل الكويز): مراجعة سريعة، بيطلّعلك لوحده أهم نقاط المحاضرة مترتبة بالأهمية (★ الأهم الأول)، من غير ما تكتب حاجة. زرار «الأهم بس» يعرضلك أهم النقاط بس، ولو دوست «عرض الكل» تشوف الباقي والمصطلحات الأساسية."},
  {go:["ct1","quiz"],sel:".card",text:"الكويز: اختر إجابة وشوف التصحيح والشرح بالعربي فوراً. درجتك بتتسجل وأفضل نتيجة بتتحفظ لكل محاضرة لوحدها."},
  {go:["ct1","recall"],sel:".card",text:"التسميع: جاوب من دماغك الأول، وبعدين اعرض الإجابة النموذجية وقارن وقيّم نفسك."},
  {go:["ct1","prog"],sel:".card",text:"صفحة التقدم: نسبتك في كل جزء من المحاضرة دي، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
- {go:["ct1","prog"],sel:".seclist",text:"قايمة السكاشن: كل سكشن ليه علامة ○. دوس عليها تبقى ✓ لما تخلصه، ودوس على اسم السكشن يفتحهولك. نسبة المحاضرة بتزيد سكشن بسكشن (السكاشن أهم جزء في النسبة)، والكويز والتسميع والكروت بيكمّلوها. وعلى كارت المحاضرة هتلاقي عدد الشرايح وعدد السكاشن اللي خلصتها."},
  {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة لكل المواد الخمسة (حوالي 10 محاضرات في الأسبوع من السبت للخميس والجمعة مراجعة)، علامة «اليوم» بتتحرك لوحدها حسب التاريخ، وتقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. والمحاضرات الموجودة في التطبيق ليها زرار (افتح) يوديك عليها على طول."},
  {go:"plan",sel:".sess.late",text:"المحاضرات المتأخرة: لو أسبوع خلص وفي محاضرة مش متعلّم عليها «تم»، بتظهر الأسبوع اللي بعده في نفس يوم محاضرة نفس المادة، بعلامة حمرا «متأخرة» ومكتوب منين جت. علّمها «تم» وتختفي. ولو المادة مفيهاش محاضرات تانية، بتظهر في أقرب يوم باقي."},
  {go:"plan",sel:".editday",text:"زرار «تعديل اليوم»: غيّر عدد محاضرات اليوم ده وإختار أنهي محاضرات بالظبط. وفي يوم الجمعة، المراجعة بتتبني من المحاضرات اللي علّمت عليها «تم» الأسبوع ده، وتقدر تعدّلها بإيدك."},
