@@ -1,5 +1,5 @@
-const CACHE = "jinostudy-v28";
-const ASSETS = ["./", "index.html", "manifest.webmanifest", "figs.js", "icon-192.svg", "icon-512.svg", "icon-maskable-512.svg"];
+const CACHE = "jinostudy-v29";
+const ASSETS = ["./", "index.html", "manifest.webmanifest", "figs.js", "icon-192.svg", "icon-512.svg", "icon-maskable-512.svg", "icon-boss-192.png", "icon-quiz-192.png"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map(a=>new Request(a,{cache:"reload"})))).then(() => self.skipWaiting()));
 });

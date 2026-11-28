@@ -36,9 +36,9 @@
    "url": "./?go=boss",
    "icons": [
     {
-     "src": "icon-192.svg",
-     "sizes": "any",
-     "type": "image/svg+xml"
+     "src": "icon-boss-192.png",
+     "sizes": "192x192",
+     "type": "image/png"
     }
    ]
   },
@@ -49,9 +49,9 @@
    "url": "./?go=quiz",
    "icons": [
     {
-     "src": "icon-192.svg",
-     "sizes": "any",
-     "type": "image/svg+xml"
+     "src": "icon-quiz-192.png",
+     "sizes": "192x192",
+     "type": "image/png"
     }
    ]
   }
