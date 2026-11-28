@@ -262,8 +262,6 @@ function home(){
   const nB=builtLecs(subj).length, nT=d.titles.length;
   h+=`<button class="card subj" onclick="goSubj('${subj}')">
     <h2>${d.name}</h2><div class="lec">${nB===nT?nT+" lectures":nB+" of "+nT+" lectures in the app"}</div>
-    <div class="bar"><div style="width:${p}%"></div></div>
-    <div class="pct">${p}% complete</div>
   </button>`;
  }
  const pl=planStats();
@@ -286,8 +284,7 @@ function picker(subj){
    const dd=DATA[lid], p=lecProgress(lid);
    h+=`<button class="card subj" onclick="goLec('${lid}')">
      <h2>Lecture ${i+1}</h2><div class="lec">${t}</div>
-     <div class="bar"><div style="width:${p}%"></div></div>
-     <div class="pct">${p}% complete - ${dd.slides?dd.slides+" slides · ":""}${dd.flash.length} cards · ${dd.quiz.length} quiz Qs · ${dd.recall.length} recall Qs</div>
+     <div class="pct">${dd.slides?dd.slides+" slides · ":""}${dd.flash.length} cards · ${dd.quiz.length} quiz Qs · ${dd.recall.length} recall Qs</div>
    </button>`;
   }else{
    h+=`<div class="card subj" style="opacity:.55;cursor:default">
@@ -535,7 +532,7 @@ function prog(sid){
   h+=`<div class="prow"><div class="lbl">${l}</div><div class="bar"><div style="width:${pct(n,m)}%"></div></div><div class="val">${n}/${m}</div></div>`;
  }
  h+=`<div class="prow"><div class="lbl">Quiz best</div><div class="bar"><div style="width:${s.quizBest}%"></div></div><div class="val">${s.quizBest}%</div></div>`;
- h+=`<div class="stat-grid"><div class="s"><b>${s.quizAtt}</b><span>quiz attempts</span></div><div class="s"><b>${lecProgress(sid)}%</b><span>overall</span></div></div>`;
+ h+=`<div class="stat-grid"><div class="s"><b>${s.quizAtt}</b><span>quiz attempts</span></div></div>`;
  h+=`<button class="btn ghost" onclick="resetProg('${sid}')">Reset progress for this lecture</button></div>`;
  return h;
 }
@@ -969,9 +966,9 @@ window.planDel=planDel;
 /* ---------- guided tour ---------- */
 const TOUR=[
  {go:null,sel:null,text:"أهلاً بيك في Jino Study! دي جولة سريعة على كل المميزات. دقيقة واحدة بس."},
- {go:"home",sel:".subj",text:"كل بطاقة مادة فيها محاضرات كاملة: شرح وكروت وكويز وتسميع ونوتس وتقدم. دوس على المادة تفتح قائمة المحاضرات."},
+ {go:"home",sel:".subj",text:"كل بطاقة مادة فيها محاضرات كاملة: شرح وكروت وكويز وتسميع ونوتس. دوس على المادة تفتح قائمة المحاضرات."},
  {go:"home",sel:".wrp",text:"Wrapped الأسبوع: دوس عليه تشوف أرقامك آخر 7 أيام (أيام المذاكرة، الأسئلة والدقة، الكروت، أكتر محاضرة) كشرايح تدوس عشان تكمّل. الأرقام بتتحسب من وقت ما اتضافت الميزة."},
- {go:"subj:ct",sel:".subj",text:"صفحة المحاضرات: كل محاضرة متضافة بتظهر بنسبة تقدمها ومحتواها. دوس على المحاضرة تفتحها."},
+ {go:"subj:ct",sel:".subj",text:"صفحة المحاضرات: كل محاضرة متضافة بتظهر بمحتواها. دوس على المحاضرة تفتحها."},
  {go:["ct1","learn"],sel:".tabs",text:"التبويبات الستة جوه كل محاضرة: Learn للشرح، Cards للحفظ، Notes لمراجعة سريعة قبل الكويز، Quiz للاختبار، Recall للتسميع، Progress لمتابعة مستواك."},
  {go:["ct1","learn"],sel:".langbtn",text:"سويتش اللغة: حرّكه لناحية ع يظهر الترجمة العربية تحت كل فقرة إنجليزي في السكشن ده بس، وارجعه EN يرجع إنجليزي بس."},
  {go:["ct1","learn"],sel:".sec .blk p",text:"دوس على أي كلمة إنجليزية في الشرح تطلعلك ترجمتها العلمية بالعربي ومعناها ونطقها. ولو حددت جملة، تظهر ترجمة الفقرة كلها. الكلمات اللي مش في القاموس هتقولك بصراحة إن مفيش ترجمة."},
@@ -983,7 +980,7 @@ const TOUR=[
  {go:["ct1","notes"],sel:".nlist",text:"تبويب Notes (قبل الكويز): مراجعة سريعة، بيطلّعلك لوحده أهم نقاط المحاضرة مترتبة بالأهمية (★ الأهم الأول)، من غير ما تكتب حاجة. زرار «الأهم بس» يعرضلك أهم النقاط بس، ولو دوست «عرض الكل» تشوف الباقي والمصطلحات الأساسية."},
  {go:["ct1","quiz"],sel:".card",text:"الكويز: اختر إجابة وشوف التصحيح والشرح بالعربي فوراً. درجتك بتتسجل وأفضل نتيجة بتتحفظ لكل محاضرة لوحدها."},
  {go:["ct1","recall"],sel:".card",text:"التسميع: جاوب من دماغك الأول، وبعدين اعرض الإجابة النموذجية وقارن وقيّم نفسك."},
- {go:["ct1","prog"],sel:".card",text:"صفحة التقدم: نسبتك في كل جزء من المحاضرة دي، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
+ {go:["ct1","prog"],sel:".card",text:"صفحة التقدم: كام سؤال/كارت خلصت في كل جزء من المحاضرة دي، وأفضل درجة كويز، وعدد المحاولات. التقدم بيتسجل على جهازك ده بس."},
  {go:"plan",sel:".card",text:"جدول المذاكرة: خطة مقترحة جاهزة لكل المواد الخمسة (حوالي 10 محاضرات في الأسبوع من السبت للخميس والجمعة مراجعة)، علامة «اليوم» بتتحرك لوحدها حسب التاريخ، وتقدر تضيف وتمسح وتعلّم الجلسة لما تخلصها. والمحاضرات الموجودة في التطبيق ليها زرار (افتح) يوديك عليها على طول."},
  {go:"plan",sel:".sess.late",text:"المحاضرات المتأخرة: لو أسبوع خلص وفي محاضرة مش متعلّم عليها «تم»، بتظهر الأسبوع اللي بعده في نفس يوم محاضرة نفس المادة، بعلامة حمرا «متأخرة» ومكتوب منين جت. علّمها «تم» وتختفي. ولو المادة مفيهاش محاضرات تانية، بتظهر في أقرب يوم باقي."},
  {go:"plan",sel:".editday",text:"زرار «تعديل اليوم»: غيّر عدد محاضرات اليوم ده وإختار أنهي محاضرات بالظبط. وفي يوم الجمعة، المراجعة بتتبني من المحاضرات اللي علّمت عليها «تم» الأسبوع ده، وتقدر تعدّلها بإيدك."},
