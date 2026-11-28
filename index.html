@@ -773,6 +773,25 @@ function planState(){
  // migration (no reset): start date, auto-built Friday reviews
  if(!S.planStartFix){S.planStartFix=1;if(S.planStart==="2026-11-28")S.planStart="2026-11-21";save()}
  if(!S.planStart){const t=new Date();const add=-((t.getDay()+1)%7);const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()+add);S.planStart=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");save()}
+
+ if(!S.planFix3){S.planFix3=1;
+  if(S.planStart!=="2026-11-28"){
+   const keep=[],pend=[];
+   for(let w=1;w<=PLAN_WEEKS;w++){const pw=S.plan[w]||{};[6,0,1,2,3,4,5].forEach(dd=>{(pw[dd]||[]).forEach(it=>{
+    if(it.done)keep.push(it); else if(it.s!=="rev")pend.push(it)})})}
+   const keys=Object.keys(SUBJECTS),order=[6,0,1,2,3,4],P=pend.length,np={};
+   for(let w=1;w<=PLAN_WEEKS;w++){
+    np[w]={6:[],0:[],1:[],2:[],3:[],4:[],5:[]};
+    const items=pend.slice(Math.floor(P*(w-1)/PLAN_WEEKS),Math.floor(P*w/PLAN_WEEKS));
+    let at=0;order.forEach((dd,di)=>{const c=Math.floor(items.length/6)+(di<items.length%6?1:0);for(let z=0;z<c;z++)np[w][dd].push(items[at++])});
+    const by={};items.forEach(it=>{(by[it.s]=by[it.s]||[]).push(it.l+1)});
+    const parts=keys.filter(k=>by[k]).map(k=>{const a=by[k].sort((x,y)=>x-y);return SUBJECTS[k].short+" "+(a.length>1?a[0]+"-"+a[a.length-1]:a[0])});
+    if(parts.length)np[w][5].push({s:"rev",l:-1,done:false,auto:true,label:"مراجعة الأسبوع: "+parts.join(" + ")+" (كروت + كويز + تسميع)"});
+   }
+   keep.forEach(it=>{(it.s==="rev"?np[1][5]:np[1][6]).push(it)});
+   S.plan=np;S.planStart="2026-11-28";
+  }
+  save()}
  for(let w=1;w<=PLAN_WEEKS;w++){(S.plan[w][5]||[]).forEach(it=>{if(it.s==="rev"&&!it.lecs&&!it.custom&&typeof it.label==="string"&&it.label.indexOf("مراجعة الأسبوع")===0&&!it.auto)it.auto=true})}
  return S.plan;
 }
