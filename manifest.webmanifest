@@ -1,31 +1,59 @@
 {
-  "name": "Jino Study",
-  "short_name": "Jino Study",
-  "description": "Offline study app: CT, Radiobiology, Nuclear Medicine, Photography and Technique lectures with flashcards, quizzes and a study plan.",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#eef0fb",
-  "theme_color": "#7c3aed",
-  "icons": [
+ "name": "Jino Study",
+ "short_name": "Jino Study",
+ "description": "Offline study app: CT, Radiobiology, Nuclear Medicine, Photography and Technique lectures with flashcards, quizzes and a study plan.",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#eef0fb",
+ "theme_color": "#7c3aed",
+ "icons": [
+  {
+   "src": "icon-192.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-maskable-512.svg",
+   "sizes": "any",
+   "type": "image/svg+xml",
+   "purpose": "maskable"
+  }
+ ],
+ "shortcuts": [
+  {
+   "name": "Boss",
+   "short_name": "Boss",
+   "description": "قاتل زعيم المحاضرة",
+   "url": "./?go=boss",
+   "icons": [
     {
-      "src": "icon-192.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-maskable-512.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
+     "src": "icon-192.svg",
+     "sizes": "any",
+     "type": "image/svg+xml"
     }
-  ]
+   ]
+  },
+  {
+   "name": "Quiz",
+   "short_name": "Quiz",
+   "description": "كويز سريع",
+   "url": "./?go=quiz",
+   "icons": [
+    {
+     "src": "icon-192.svg",
+     "sizes": "any",
+     "type": "image/svg+xml"
+    }
+   ]
+  }
+ ]
 }

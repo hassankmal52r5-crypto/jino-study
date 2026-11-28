@@ -176,7 +176,25 @@ header p{margin:4px 0 0;opacity:.85;font-size:13px}
 .note .ntag{display:inline-block;font-size:10.5px;color:#92400e;background:#fef3c7;border-radius:8px;padding:1px 7px;margin-top:6px}
 .nterm{padding:7px 2px;border-bottom:1px solid #e5e7eb;font-size:13.5px}.nterm b{color:#3730a3}.nterm .ar{display:block;direction:rtl;text-align:right;color:#57534e;font-size:12.5px}
 .sess.late{border-color:#fca5a5;background:#fef2f2}.sess .ltag{display:inline-block;background:#dc2626;color:#fff;border-radius:8px;font-size:10.5px;font-weight:800;padding:1px 7px;margin-right:6px}.sess .lnote{display:block;color:#b91c1c;font-size:11px}
-</style>
+
+.stk{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fff7ed,#fef3c7)}
+.stkl{min-width:64px;text-align:center}.stkr{flex:1;direction:rtl;text-align:right}
+.flame{display:inline-block;animation:flk 1.2s ease-in-out infinite;transform-origin:50% 90%}
+.flame.out{animation:none;opacity:.6}
+@keyframes flk{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.12) rotate(3deg)}}
+.wrp{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;text-align:right;direction:rtl;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;cursor:pointer}
+.wrp .wgo{background:rgba(255,255,255,.25);border-radius:99px;padding:7px 16px;font-weight:800}
+#wrapov{position:fixed;inset:0;z-index:9999;background:rgba(15,10,40,.92);display:flex;align-items:center;justify-content:center;padding:20px}
+.wcard{width:100%;max-width:380px;min-height:62vh;border-radius:24px;background:linear-gradient(160deg,#4c1d95,#be185d);color:#fff;padding:26px 22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;direction:rtl;cursor:pointer}
+.wdots{display:flex;gap:5px;width:100%;margin-bottom:auto}.wdots i{flex:1;height:4px;border-radius:3px;background:rgba(255,255,255,.3)}.wdots i.on{background:#fff}
+.wh{font-size:18px;opacity:.9;margin-top:20px}.wbig{font-size:76px;font-weight:900;margin:14px 0}.wt{font-size:16px;line-height:1.7}.wtap{margin-top:auto;font-size:12px;opacity:.7;padding-top:20px}
+.bhud{background:#1e1b4b;color:#fff;border-radius:18px;padding:14px;margin:14px 0;direction:rtl;text-align:right}
+.bname{font-weight:800;margin-bottom:8px}.hpbar{height:16px;background:#4b1d1d;border-radius:9px;overflow:hidden}
+.hpfill{height:100%;background:linear-gradient(90deg,#ef4444,#f97316);transition:width .5s}
+.bhud .small{color:#c7d2fe;margin-top:6px}
+.roast{margin:10px 0;padding:10px 12px;border-radius:12px;font-weight:800;direction:rtl;text-align:right}
+.roast.g{background:#f0fdf4;color:#166534}.roast.b{background:#fef2f2;color:#991b1b}
+.stk.resc{background:linear-gradient(135deg,#fee2e2,#fed7aa);animation:rsc 1s ease-in-out infinite}.stk.resc .flame{filter:grayscale(.6)}.rbtn{margin-top:8px;padding:10px}@keyframes rsc{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}</style>
 </head>
 <body>
 <header id="hdr"></header>
@@ -250,7 +268,7 @@ window.setTab=setTab;
 
 function home(){
  headerHome();
- let h="";
+ let h=streakCard()+wrappedCard();
  for(const subj of ['ct','bio','np','photo','tech']){
   const d=SUBJECTS[subj], p=subjProgress(subj);
   const nB=builtLecs(subj).length, nT=d.titles.length;
@@ -294,7 +312,7 @@ function picker(subj){
 }
 
 function tabsHtml(sid){
- const t=[["learn","Learn"],["cards","Cards"],["notes","Notes"],["quiz","Quiz"],["recall","Recall"],["prog","Progress"]];
+ const t=[["learn","Learn"],["cards","Cards"],["notes","Notes"],["quiz","Quiz"],["recall","Recall"],["boss","Boss"],["prog","Progress"]];
  return `<div class="tabs">`+t.map(([k,l])=>`<button class="${tab===k?'on':''}" onclick="setTab('${k}')">${l}</button>`).join("")+`</div>`;
 }
 
@@ -964,8 +982,11 @@ window.planDel=planDel;
 const TOUR=[
  {go:null,sel:null,text:"أهلاً بيك في Jino Study! دي جولة سريعة على كل المميزات. دقيقة واحدة بس."},
  {go:"home",sel:".subj",text:"كل بطاقة مادة فيها محاضرات كاملة: شرح وكروت وكويز وتسميع ونوتس وتقدم. دوس على المادة تفتح قائمة المحاضرات."},
+ {go:"home",sel:".stk",text:"شعلة المذاكرة: كل يوم بتحل فيه سؤال أو كارت أو تسميع بتكبر. لو سيبت يوم كامل بتطفي 💨 وبتبدأ من الأول. تحتها أطول شعلة وصلتلها."},
+ {go:"home",sel:".wrp",text:"Wrapped الأسبوع: دوس عليه تشوف أرقامك آخر 7 أيام (أيام المذاكرة، الأسئلة والدقة، الكروت، البوسات، أكتر محاضرة) كشرايح تدوس عشان تكمّل. الأرقام بتتحسب من وقت ما اتضافت الميزة."},
  {go:"subj:ct",sel:".subj",text:"صفحة المحاضرات: كل محاضرة متضافة بتظهر بنسبة تقدمها ومحتواها. دوس على المحاضرة تفتحها."},
- {go:["ct1","learn"],sel:".tabs",text:"التبويبات الستة جوه كل محاضرة: Learn للشرح، Cards للحفظ، Notes لمراجعة سريعة قبل الكويز، Quiz للاختبار، Recall للتسميع، Progress لمتابعة مستواك."},
+ {go:["ct1","learn"],sel:".tabs",text:"التبويبات السبعة جوه كل محاضرة: Learn للشرح، Cards للحفظ، Notes لمراجعة سريعة قبل الكويز، Quiz للاختبار، Recall للتسميع، Boss للزعيم، Progress لمتابعة مستواك."},
+ {go:["ct1","boss"],sel:".bossbox",text:"تبويب Boss: لكل محاضرة زعيم. كل إجابة صح من أسئلة المحاضرة بتنزّل شريط صحته، وكل غلطة بتخسّرك قلب من 3 والزعيم بيتريق. لما تهزمه بتفتح الزعيم اللي بعده (المحاضرات نفسها دايماً مفتوحة)."},
  {go:["ct1","learn"],sel:".langbtn",text:"سويتش اللغة: حرّكه لناحية ع يظهر الترجمة العربية تحت كل فقرة إنجليزي في السكشن ده بس، وارجعه EN يرجع إنجليزي بس."},
  {go:["ct1","learn"],sel:".sec .blk p",text:"دوس على أي كلمة إنجليزية في الشرح تطلعلك ترجمتها العلمية بالعربي ومعناها ونطقها. ولو حددت جملة، تظهر ترجمة الفقرة كلها. الكلمات اللي مش في القاموس هتقولك بصراحة إن مفيش ترجمة."},
  {go:["ct1","learn"],sel:".chip",text:"المصطلحات المهمة آخر كل سكشن: دوس على المصطلح يظهر تعريفه إنجليزي وعربي."},
@@ -1034,11 +1055,167 @@ function render(){
  else if(tab==="cards")body=cards(cur);
  else if(tab==="quiz")body=quiz(cur);
  else if(tab==="recall")body=recall(cur);
+ else if(tab==="boss")body=bossView(cur);
  else if(tab==="notes")body=notes(cur);
  else body=prog(cur);
  app.innerHTML=tabsHtml(cur)+body;
  initViewers();
 }
+/* ---------- fun pack: streak, boss, wrapped ---------- */
+function dkey(d){d=d||new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())}
+function dback(n){const d=new Date();d.setDate(d.getDate()-n);return dkey(d)}
+function actDay(){if(!S.act)S.act={};const k=dkey();if(!S.act[k])S.act[k]={q:0,c:0,f:0,r:0,b:0,l:{}};return S.act[k]}
+function logAct(kind,ok,lid){const a=actDay();if(kind==="q"){a.q++;if(ok)a.c++}else a[kind]=(a[kind]||0)+1;if(lid){a.l[lid]=(a.l[lid]||0)+1}save()}
+function streakInfo(){
+ const act=S.act||{};let n=0,i=0;
+ const todayDone=!!act[dback(0)];
+ i=todayDone?0:1;
+ while(act[dback(i)]){n++;i++}
+ let best=0,run=0;const ks=Object.keys(act).sort();
+ for(let j=0;j<ks.length;j++){
+  if(j>0){const a=new Date(ks[j-1]+"T00:00:00"),b=new Date(ks[j]+"T00:00:00");run=Math.round((b-a)/864e5)===1?run+1:1}else run=1;
+  if(run>best)best=run}
+ const hasAny=ks.length>0;
+ const out=hasAny&&!todayDone&&!act[dback(1)];
+ return {n:n,today:todayDone,best:Math.max(best,n),out:out,any:hasAny};
+}
+function flameSvg(n,out){
+ const sc=out?.8:Math.min(1.9,.9+n*.1);
+ if(out)return `<div class="flame out" style="font-size:${46*sc}px">💨</div>`;
+ const ic=n>=14?"🔥":"🔥";
+ return `<div class="flame" style="font-size:${40*sc}px;animation-duration:${Math.max(.6,1.6-n*.07)}s">${ic}</div>`;
+}
+function streakCard(){
+ const s=streakInfo();
+ let t,sub,resc=false;
+ if(!s.any){t="ابدأ الشعلة بتاعتك";sub="حل سؤال أو كارت النهاردة وتولع 🔥"}
+ else if(s.out){t="الشعلة طفت 💨";sub="أطول شعلة ليك كانت "+s.best+" يوم. ذاكر النهاردة وولّعها من جديد."}
+ else if(!s.today){const R=[["الحقها! شعلتك هتطفي 🆘","حل سؤال واحد بس وتنقذها"],["الشعلة بتترعش... "+s.n+" يوم هيروحوا!","كارت واحد كفاية تنقذها 🔥"],["ما تسيبهاش تموت يا جينو 😭","دقيقة مذاكرة وتفضل مولعة"],["آخر فرصة النهاردة ⏳","سؤال بوس واحد وتأمن الشعلة"]];const r=R[Math.floor(Math.random()*R.length)];t=r[0];sub=r[1];resc=true}
+ else{t=s.n+" "+(s.n===1?"يوم":"يوم")+" ورا بعض 🔥";sub=s.n>=7?"أسطورة يا جينو. كمّل!":"كمّل بكرة وهتكبر"}
+ return `<div class="card stk${resc?" resc":""}"><div class="stkl">${flameSvg(s.n,s.out)}</div><div class="stkr"><b>${t}</b><div class="small">${sub}</div>${resc?`<button class="btn rbtn" onclick="goHome();const ls=builtLecs('ct');goLec(ls[0],'boss')">أنقذ الشعلة ⚔️</button>`:""}<div class="small">Best streak: ${s.best} day${s.best===1?"":"s"}</div></div></div>`;
+}
+function weekStats(){
+ const act=S.act||{};let days=0,q=0,c=0,f=0,r=0,b=0;const L={};
+ for(let i=0;i<7;i++){const a=act[dback(i)];if(!a)continue;days++;q+=a.q;c+=a.c;f+=a.f;r+=a.r;b+=a.b;for(const k in a.l)L[k]=(L[k]||0)+a.l[k]}
+ let top=null,tv=0;for(const k in L)if(L[k]>tv){tv=L[k];top=k}
+ return {days:days,q:q,c:c,f:f,r:r,b:b,acc:pct(c,q),top:top,streak:streakInfo().n};
+}
+function wrappedCard(){
+ const w=weekStats();
+ return `<button class="card wrp" onclick="wrapOpen()"><div><b>Wrapped الأسبوع ✨</b><div class="small" style="color:#fff;opacity:.85">${w.days} يوم · ${w.q} سؤال · ${w.f+w.r} كارت وتسميع</div></div><span class="wgo">شوف</span></button>`;
+}
+let wrapI=0;
+function wrapSlides(){
+ const w=weekStats();
+ const tn=w.top&&DATA[w.top]?DATA[w.top].name+" · "+DATA[w.top].lec:"لسه مفيش";
+ const em=w.q===0?"ابدأ وهتتملي أرقامك":w.acc>=80?"إجاباتك جامدة 🔥":w.acc>=60?"كويس، لسه فيه مجال 👌":"محتاج مراجعة، بس هتظبط 💪";
+ return [
+  {h:"أسبوعك يا جينو",big:w.days+"/7",t:"أيام ذاكرت فيها آخر 7 أيام"},
+  {h:"الأسئلة",big:String(w.q),t:"سؤال جاوبته (كويز وبوس). الصح: "+w.c+" · الدقة "+w.acc+"%. "+em},
+  {h:"الحفظ والتسميع",big:String(w.f+w.r),t:w.f+" كارت و "+w.r+" سؤال تسميع قيّمت نفسك فيهم"},
+  {h:"البوسات",big:String(w.b),t:"بوس اتهزم الأسبوع ده 👹"},
+  {h:"أكتر محاضرة ذاكرتها",big:"📚",t:tn},
+  {h:"الشعلة",big:w.streak+"🔥",t:"أيام ورا بعض دلوقتي. أطول شعلة: "+streakInfo().best}
+ ];
+}
+function wrapOpen(){wrapI=0;wrapShow()}
+window.wrapOpen=wrapOpen;
+function wrapShow(){
+ let o=document.getElementById("wrapov");
+ if(!o){o=document.createElement("div");o.id="wrapov";document.body.appendChild(o)}
+ const S2=wrapSlides();
+ if(wrapI>=S2.length){o.remove();return}
+ const s=S2[wrapI];
+ o.innerHTML=`<div class="wcard" onclick="wrapNext()"><div class="wdots">${S2.map((x,i)=>`<i class="${i<=wrapI?"on":""}"></i>`).join("")}</div><div class="wh">${s.h}</div><div class="wbig">${s.big}</div><div class="wt">${s.t}</div><div class="wtap">${wrapI===S2.length-1?"دوس عشان تقفل":"دوس عشان تكمّل"}</div></div>`;
+}
+function wrapNext(){wrapI++;wrapShow()}
+window.wrapNext=wrapNext;
+
+/* boss */
+const ROAST_OK=["آه! ضربة معلّم 💥","الزعيم اتهز!","كمان واحدة وهيقع","ده كان سهل عليك؟","الزعيم بيعرق دلوقتي"];
+const ROAST_BAD=["إيه ده يا جينو 😅 الزعيم بيضحك عليك","غلط! الزعيم ضربك 💔","ده سؤال بتاع أول يوم!","المحاضرة بتعيط عليك 😭","ركّز، الزعيم مش بيرحم"];
+const BOSS_WIN=["الزعيم وقع! المحاضرة اللي بعدها اتفتحت 🔓","هزمته! أنت أسطورة 👑"];
+const BOSS_LOSE=["القلوب خلصت 💀 الزعيم كسبك المرة دي. جرّب تاني!"];
+let BS={lid:null,q:[],hp:0,max:0,hearts:3,qi:0,sel:null,msg:"",st:"play"};
+function bossReset(){BS={lid:null,q:[],hp:0,max:0,hearts:3,qi:0,sel:null,msg:"",st:"play"}}
+function bossLocked(lid){
+ const subj=lid.replace(/\d+$/,''),ls=builtLecs(subj),i=ls.indexOf(lid);
+ if(i<=0)return null;
+ const prev=ls[i-1];
+ return (S.boss&&S.boss[prev])?null:prev;
+}
+function bossStart(lid){
+ const d=DATA[lid],idx=d.quiz.map((q,i)=>i);
+ for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=idx[i];idx[i]=idx[j];idx[j]=t}
+ const n=Math.min(10,idx.length);
+ BS={lid:lid,q:idx.slice(0,n),hp:n,max:n,hearts:3,qi:0,sel:null,msg:"",st:"play"};
+ render();
+}
+window.bossStart=bossStart;
+function bossAns(i){
+ if(BS.sel!==null||BS.st!=="play")return;
+ const q=DATA[BS.lid].quiz[BS.q[BS.qi]];BS.sel=i;
+ const ok=i===q.a;
+ logAct("q",ok,BS.lid);
+ if(ok){BS.hp--;BS.msg=ROAST_OK[Math.floor(Math.random()*ROAST_OK.length)]}
+ else{BS.hearts--;BS.msg=ROAST_BAD[Math.floor(Math.random()*ROAST_BAD.length)];BS.q.push(BS.q[BS.qi])}
+ render();
+}
+window.bossAns=bossAns;
+function bossNext(){
+ if(BS.hp<=0){
+  if(!S.boss)S.boss={};
+  if(!S.boss[BS.lid]){S.boss[BS.lid]=1;logAct("b",true,BS.lid)}
+  BS.st="win";BS.msg=BOSS_WIN[0]
+ }else if(BS.hearts<=0){BS.st="lose";BS.msg=BOSS_LOSE[0]}
+ else{BS.qi++;BS.sel=null;BS.msg=""}
+ save();render();
+}
+window.bossNext=bossNext;
+function bossHud(d){
+ const pctHp=BS.max?Math.round(BS.hp/BS.max*100):0;
+ let h=BS.hearts>0?"":"";
+ let hearts="";for(let i=0;i<3;i++)hearts+=i<BS.hearts?"❤️":"🖤";
+ return `<div class="bhud"><div class="bname">👹 ${d.name}</div><div class="hpbar"><div class="hpfill" style="width:${pctHp}%"></div></div><div class="small">Boss HP ${BS.hp}/${BS.max} · أنت: ${hearts}</div></div>`;
+}
+function bossView(lid){
+ const d=DATA[lid];
+ const lock=bossLocked(lid);
+ const beaten=S.boss&&S.boss[lid];
+ if(lock){
+  return `<div class="card center bossbox"><div style="font-size:54px">🔒</div><h3>زعيم مقفول</h3><p>اهزم زعيم <b>${DATA[lock].name} · ${DATA[lock].lec}</b> الأول عشان تفتح الزعيم ده.</p><button class="btn" onclick="goLec('${lock}','boss')">روح للزعيم اللي قبله</button><p class="small">المحاضرة نفسها مفتوحة وتقدر تذاكرها عادي.</p></div>`;
+ }
+ if(BS.lid!==lid||BS.st==="idle"){
+  return `<div class="card center bossbox"><div style="font-size:54px">👹</div><h3>زعيم ${d.name}</h3><p>${d.lec}</p><p>كل إجابة صح بتنزّل شريط صحته. كل غلطة بتخسّرك قلب من 3. هزمه وتفتح الزعيم اللي بعده.</p>${beaten?'<p class="small">✅ هزمته قبل كده. ممكن تعيدها.</p>':""}<button class="btn" onclick="bossStart('${lid}')">${beaten?"قاتله تاني":"ابدأ المعركة"} ⚔️</button></div>`;
+ }
+ if(BS.st==="win")return bossHud(d)+`<div class="card center bossbox"><div style="font-size:54px">👑</div><h3>${BS.msg}</h3><button class="btn" onclick="bossStart('${lid}')">قاتله تاني</button></div>`;
+ if(BS.st==="lose")return bossHud(d)+`<div class="card center bossbox"><div style="font-size:54px">💀</div><h3>${BS.msg}</h3><button class="btn" onclick="bossStart('${lid}')">جرّب تاني</button></div>`;
+ const q=DATA[lid].quiz[BS.q[BS.qi]];
+ let h=bossHud(d)+`<div class="card bossbox"><div class="prog">سؤال ${BS.qi+1}</div><div class="q">${q.q}</div>`;
+ q.o.forEach((op,i)=>{
+  let cls="opt";
+  if(BS.sel!==null){if(i===q.a)cls+=" ok";else if(i===BS.sel)cls+=" bad"}
+  h+=`<button class="${cls}" ${BS.sel!==null?"disabled":""} onclick="bossAns(${i})">${op}</button>`;
+ });
+ if(BS.sel!==null){
+  h+=`<div class="roast ${BS.sel===q.a?"g":"b"}">${BS.msg}</div><div class="small" style="direction:rtl;text-align:right">${q.w||""}</div><button class="btn" onclick="bossNext()">${BS.hp<=0?"الضربة الأخيرة 💥":BS.hearts<=0?"كمّل":"التالي"}</button>`;
+ }
+ return h+`</div>`;
+}
+/* hooks */
+(function(){
+ const oa=window.ans;window.ans=function(sid,i){const q=DATA[sid].quiz[qi];const was=qlock;oa(sid,i);if(!was&&q)logAct("q",i===q.a,sid)};
+ const of=window.flashAns;window.flashAns=function(sid,ok){logAct("f",ok,sid);of(sid,ok)};
+ const orr=window.recallAns;window.recallAns=function(sid,ok){logAct("r",ok,sid);orr(sid,ok)};
+ const ost=window.setTab;window.setTab=function(t){bossReset();ost(t)};
+ const ogl=window.goLec;window.goLec=function(l,t){bossReset();if(l&&DATA[l]){S.last=l;save()}ogl(l,t)};
+})();
+
+(function(){var m=/[?&]go=(boss|quiz)/.exec(location.search);if(!m)return;
+ var l=S.last&&DATA[S.last]?S.last:builtLecs("ct")[0];
+ S.tourDone=S.tourDone||0;cur=l;tab=m[1];render();
+ try{history.replaceState(null,"",location.pathname)}catch(e){}})();
+
 render();
 if(!S.tourDone){setTimeout(tourStart,700)}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!planEdit&&(cur==="plan"||!cur))render()});
